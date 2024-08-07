@@ -18,7 +18,7 @@ void input()
     for (int i = 0; i < n; i++)
     {
         v[i] = vector<int>();
-        // vector initialization : necessary to get rid of trash values
+        // vector initialization : necessary to get rid of trash valuesd
         visited[i] = 0;
         dist[i] = -1;
     }
