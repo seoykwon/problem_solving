@@ -13,7 +13,7 @@ int arrive = 0;
 
 void input()
 {
-    freopen("input.txt", "r", stdin);
+    // freopen("input.txt", "r", stdin);
     cin >> n >> m;
     for (int i = 0; i < n; i++)
     {
