@@ -7,10 +7,8 @@ using namespace std;
 int n, k;
 vector<int> b1;
 vector<int> b2;
-int visited1[100001];
-int visited2[100001];
-int cnt = 0;
-int ans = 0;
+int visited1[100001] = {0};
+int visited2[100001] = {0};
 
 void input()
 {
@@ -22,114 +20,94 @@ void input()
     string s2;
     cin >> s2;
 
-    int idx = 1;
     for (char c : s)
     {
-        b1.push_back(c - '0' + 1);
-        idx++;
+        b1.push_back(c - '0');
     }
 
-    idx = 1;
     for (char c : s2)
     {
-        b2.push_back(c - '0' + 1);
-        idx++;
+        b2.push_back(c - '0');
     }
 }
 
-void bfs(int start)
+bool bfs()
 {
     queue<pair<int, int>> q;
-    q.push(make_pair(start, 1));
+    q.push(make_pair(0, 1));
+    visited1[0] = 1;
+
+    int cnt = 0;
 
     while (!q.empty())
     {
-        pair<int, int> now = q.front();
-        q.pop();
+        int size = q.size();
+        cnt++; // tiles at index 'cnt' on both bridges will be destroyed
 
-        if (cnt > n)
+        // needs to loop through until the starting size decreases to 0 at least
+        // so they separately expand
+        while (size--)
         {
-            ans = 1;
-            return;
-        }
+            int pos = q.front().first;
+            int bridge = q.front().second;
+            q.pop();
 
-        int pos_same[] = {now.first + 1, now.first - 1, now.first + k};
-
-        for (int i = 0; i < sizeof(pos_same) / sizeof(pos_same[0]); ++i)
-        {
-            if (now.second == 1)
+            if (pos + 1 >= n || pos + k >= n)
             {
-                if (pos_same[i] >= 0 && b1[pos_same[i]] == 1 && !visited1[pos_same[i]])
+                return true;
+            }
+
+            if (bridge == 1)
+            {
+                if (!visited1[pos + 1] && (pos + 1) < n && b1[pos + 1] == 1)
                 {
-                    q.push(make_pair(pos_same[i], 1));
-                    visited1[pos_same[i]] = 1;
-                    if (pos_same[i] > 0)
-                    {
-                        b1[now.first] = 0;
-                        b2[now.first] = 0;
-                    }
-                    if (i == 0)
-                    {
-                        cnt++;
-                    }
-                    else if (i == 1)
-                    {
-                        cnt--;
-                    }
+                    q.push(make_pair(pos + 1, 1));
+                    visited1[pos + 1] = 1;
                 }
-                if (pos_same[i] >= 0 && b2[pos_same[i]] == 1 && !visited2[pos_same[i]])
+                if (!visited1[pos - 1] && (pos - 1) > cnt && b1[pos - 1] == 1)
                 {
-                    q.push(make_pair(pos_same[i], 2));
-                    visited2[pos_same[i]] = 1;
-                    if (pos_same[i] > 0)
-                    {
-                        b1[now.first] = 0;
-                        b2[now.first] = 0;
-                    }
-                    cnt += k;
+                    q.push(make_pair(pos - 1, 1));
+                    visited1[pos - 1] = 1;
+                }
+                if (!visited2[pos + k] && pos + k < n && b2[pos + k] == 1)
+                {
+                    q.push(make_pair(pos + k, 2));
+                    visited2[pos + k] = 1;
                 }
             }
-            else if (now.second == 2)
+            else
             {
-                if (pos_same[i] >= 0 && b2[pos_same[i]] == 1 && !visited2[pos_same[i]])
+                if (!visited2[pos + 1] && (pos + 1) < n && b2[pos + 1] == 1)
                 {
-                    q.push(make_pair(pos_same[i], 2));
-                    visited2[pos_same[i]] = 1;
-                    if (pos_same[i] > 0)
-                    {
-                        b1[now.first] = 0;
-                        b2[now.first] = 0;
-                    }
-                    if (i == 0)
-                    {
-                        cnt++;
-                    }
-                    else if (i == 1)
-                    {
-                        cnt--;
-                    }
+                    q.push(make_pair(pos + 1, 2));
+                    visited2[pos + 1] = 1;
                 }
-                if (pos_same[i] >= 0 && b1[pos_same[i]] == 1 && !visited1[pos_same[i]])
+                if (!visited2[pos - 1] && (pos - 1) > cnt && b2[pos - 1] == 1)
                 {
-                    q.push(make_pair(pos_same[i], 1));
-                    visited1[pos_same[i]] = 1;
-                    if (pos_same[i] > 0)
-                    {
-                        b1[now.first] = 0;
-                        b2[now.first] = 0;
-                    }
-                    cnt += k;
+                    q.push(make_pair(pos - 1, 2));
+                    visited2[pos - 1] = 1;
+                }
+                if (!visited1[pos + k] && pos + k < n && b1[pos + k] == 1)
+                {
+                    q.push(make_pair(pos + k, 1));
+                    visited1[pos + k] = 1;
                 }
             }
         }
     }
+    return false;
 }
 
 int main()
 {
     input();
 
-    bfs(-1);
-
-    cout << ans;
+    if (bfs())
+    {
+        cout << 1;
+    }
+    else
+    {
+        cout << 0;
+    }
 }
