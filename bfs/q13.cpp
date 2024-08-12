@@ -23,7 +23,6 @@ void input()
 
     // n*n 2로 채워진 배열
     // vector<vector<int>> v(n, vector<int>(n,2));
-
     for (int i = 0; i < m; i++)
     {
         for (int j = 0; j < k; j++)
