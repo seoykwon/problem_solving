@@ -71,8 +71,8 @@ void dfs(int y, int x, int trial)
 
             if ((board[ny][nx] == 1 || board[ny][nx] == 3) && !can_j)
             {
-                // int nny = y + ydir[i] * (j + 1);
-                // int nnx = x + xdir[i] * (j + 1);
+                // int nny = ny + ydir[i];
+                // int nnx = nx + xdir[i];
 
                 // if (nny < 0 || nnx < 0 || nny >= N || nnx >= N)
                 //     break;
@@ -81,13 +81,18 @@ void dfs(int y, int x, int trial)
                 // {
                 //     can_j = true;
                 // }
+                // else if (board[nny][nnx] == 1)
+                // {
+                //     dfs(nny, nnx, trial + 1);
+                //     break;
+                // }
                 can_j = true;
                 continue;
             }
 
             if (can_j)
             {
-                cout << ny << " " << nx << " trial: " << trial << endl;
+                // cout << ny << " " << nx << " trial: " << trial << endl;
                 dfs(ny, nx, trial + 1);
             }
         }
@@ -96,7 +101,7 @@ void dfs(int y, int x, int trial)
 
 int main()
 {
-    // freopen("input.txt", "r", stdin);
+    freopen("input.txt", "r", stdin);
     cin >> T;
 
     for (int t = 1; t <= T; t++)
