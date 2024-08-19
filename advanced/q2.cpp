@@ -49,7 +49,7 @@ void dfs(int y, int x, int trial)
     if (board[y][x] == 1)
     {
 
-        // cout << "eat jjol: " << y << " " << x << endl;
+        cout << "eat jjol: " << y << " " << x << endl;
         cnt++;
         // cout << "cnt: " << cnt << endl;
         board[y][x] = 3;
@@ -77,9 +77,9 @@ void dfs(int y, int x, int trial)
                 // if (nny < 0 || nnx < 0 || nny >= N || nnx >= N)
                 //     break;
 
-                // if (board[nny][nnx] == 0)
+                // if (board[nny][nnx] != 0)
                 // {
-                //     can_j = true;
+                //     break;
                 // }
                 can_j = true;
                 continue;
@@ -87,7 +87,17 @@ void dfs(int y, int x, int trial)
 
             if (can_j)
             {
-                cout << ny << " " << nx << " trial: " << trial << endl;
+                // cout << ny << " " << nx << endl;
+                int nny = y + ydir[i] * (j - 1);
+                int nnx = x + xdir[i] * (j - 1);
+                int nnny = y + ydir[i] * (j - 2);
+                int nnnx = x + xdir[i] * (j - 2);
+
+                if ((board[nny][nnx] == 1 || board[nny][nnx] == 3) && (board[nnny][nnnx] == 1 || board[nnny][nnnx] == 3)){
+                    break;
+                }
+
+                // cout << ny << " " << nx << endl;
                 dfs(ny, nx, trial + 1);
             }
         }
@@ -96,7 +106,7 @@ void dfs(int y, int x, int trial)
 
 int main()
 {
-    // freopen("input.txt", "r", stdin);
+    freopen("input.txt", "r", stdin);
     cin >> T;
 
     for (int t = 1; t <= T; t++)
