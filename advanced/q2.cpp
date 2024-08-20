@@ -14,6 +14,7 @@ int visited[51][51] = {
 
 void input()
 {
+    cnt = 0;
     cin >> N;
 
     for (int i = 0; i < N; i++)
@@ -49,7 +50,7 @@ void dfs(int y, int x, int trial)
     if (board[y][x] == 1)
     {
 
-        // cout << "eat jjol: " << y << " " << x << endl;
+        cout << "eat jjol: " << y << " " << x << endl;
         cnt++;
         // cout << "cnt: " << cnt << endl;
         board[y][x] = 3;
@@ -71,19 +72,14 @@ void dfs(int y, int x, int trial)
 
             if ((board[ny][nx] == 1 || board[ny][nx] == 3) && !can_j)
             {
-                // int nny = ny + ydir[i];
-                // int nnx = nx + xdir[i];
+                // int nny = y + ydir[i] * (j + 1);
+                // int nnx = x + xdir[i] * (j + 1);
 
                 // if (nny < 0 || nnx < 0 || nny >= N || nnx >= N)
                 //     break;
 
-                // if (board[nny][nnx] == 0)
+                // if (board[nny][nnx] != 0)
                 // {
-                //     can_j = true;
-                // }
-                // else if (board[nny][nnx] == 1)
-                // {
-                //     dfs(nny, nnx, trial + 1);
                 //     break;
                 // }
                 can_j = true;
@@ -92,7 +88,18 @@ void dfs(int y, int x, int trial)
 
             if (can_j)
             {
-                // cout << ny << " " << nx << " trial: " << trial << endl;
+                // cout << ny << " " << nx << endl;
+                // int nny = y + ydir[i] * (j - 1);
+                // int nnx = x + xdir[i] * (j - 1);
+                // int nnny = y + ydir[i] * (j - 2);
+                // int nnnx = x + xdir[i] * (j - 2);
+
+                // if ((board[nny][nnx] == 1 || board[nny][nnx] == 3) && (board[nnny][nnnx] == 1 || board[nnny][nnnx] == 3))
+                // {
+                //     break;
+                // }
+
+                // cout << ny << " " << nx << endl;
                 dfs(ny, nx, trial + 1);
             }
         }
@@ -113,3 +120,12 @@ int main()
         cout << "#" << t << " " << cnt << endl;
     }
 }
+
+/*
+(4, 1) (7, 0) (7, 2) 를 먹으면 안 됨
+(8, 8) (2, 7) 을 먹어야 함
+
+그래서 지금 테케 2 16 - 3 + 2 = 15가 되어야 함.
+
+왜 이런 결과가 나오는 거지?
+*/
