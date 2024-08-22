@@ -40,6 +40,7 @@ void dijkstra(int y, int x)
 
         if (dist[now.y][now.x] < now.cost)
             continue;
+        // 불필요한 작업임
 
         for (int i = 0; i < 4; i++)
         {
@@ -51,18 +52,20 @@ void dijkstra(int y, int x)
 
             int nextcost = now.cost + town[ny][nx];
 
-            // if (nextcost < dist[ny][nx]){
-            //     dist[ny][nx] = nextcost;
-
-            // }
-            q.push({ny, nx, nextcost});
+            // 하지만 이 작업은 꼭 필요함
+            // 최단 거리만을 가려면 이 조건문이 존재해야 함
+            if (nextcost < dist[ny][nx])
+            {
+                dist[ny][nx] = nextcost;
+                q.push({ny, nx, nextcost});
+            }
         }
     }
 }
 
 int main()
 {
-    freopen("input.txt", "r", stdin);
+    // freopen("input.txt", "r", stdin);
     cin >> y >> x;
     cin >> n;
 
@@ -81,7 +84,8 @@ int main()
     {
         for (int j = 0; j < n; j++)
         {
-            if (maxCnt < dist[i][j])
+            // 초기값을 제외해 주는 부분이 중요함
+            if (maxCnt < dist[i][j] && dist[i][j] != 21e8)
             {
                 maxCnt = dist[i][j];
             }
