@@ -90,191 +90,191 @@
 // }
 
 // ################### kruskal #######################
-// #include <iostream>
-// #include <queue>
-// #include <algorithm>
-
-// using namespace std;
-
-// struct Edge
-// {
-//     int from;
-//     int to;
-//     int cost;
-// };
-
-// bool cmp(Edge a, Edge b)
-// {
-//     if (a.cost < b.cost)
-//         return true;
-//     if (a.cost > b.cost)
-//         return false;
-//     return false;
-// }
-
-// int N, M;
-// int parent[1001];
-// Edge edges[1001];
-// char gender[1001];
-
-// int Find(int node)
-// {
-//     if (node == parent[node])
-//         return node;
-
-//     return parent[node] = Find(parent[node]);
-// }
-
-// void Union(int a, int b)
-// {
-//     int rootA = Find(a);
-//     int rootB = Find(b);
-
-//     if (rootA == rootB)
-//         return;
-
-//     parent[rootB] = rootA;
-// }
-
-// int kruskal()
-// {
-//     int totalcost = 0;
-//     int cntEdge = 0;
-//     sort(edges, edges + M, cmp);
-
-//     for (int i = 0; i < M; i++)
-//     {
-//         Edge now = edges[i];
-
-//         if (Find(now.from) == Find(now.to) || gender[now.from] == gender[now.to])
-//             continue;
-
-//         totalcost += now.cost;
-//         cntEdge++;
-
-//         if (cntEdge == N - 1)
-//             break;
-
-//         Union(now.from, now.to);
-//     }
-//     if (cntEdge == N - 1)
-//     {
-//         return totalcost;
-//     }
-//     return -1;
-// }
-
-// int main()
-// {
-//     // freopen("input.txt", "r", stdin);
-//     cin >> N >> M;
-
-//     for (int i = 1; i <= N; i++)
-//     {
-//         char sex;
-//         cin >> sex;
-
-//         gender[i] = sex;
-
-//         // parent 초기화 해주기!!!!! 이거 때문에 디버깅 해야 했음
-//         parent[i] = i;
-//     }
-
-//     for (int i = 0; i < M; i++)
-//     {
-//         int from, to, cost;
-
-//         cin >> from >> to >> cost;
-
-//         // if (gender[from] == gender[to])
-//         //     continue;
-
-//         edges[i] = {from, to, cost};
-//     }
-
-//     cout << kruskal();
-// }
-
-// #################### kruskal with better time complexity #######################
 #include <iostream>
-#include <vector>
+#include <queue>
 #include <algorithm>
+
 using namespace std;
 
 struct Edge
 {
-    int a, b, cost;
+    int from;
+    int to;
+    int cost;
 };
 
-bool cmp(Edge left, Edge right)
+bool cmp(Edge a, Edge b)
 {
-    if (left.cost < right.cost)
+    if (a.cost < b.cost)
         return true;
-    if (left.cost > right.cost)
+    if (a.cost > b.cost)
         return false;
     return false;
 }
 
 int N, M;
 int parent[1001];
+Edge edges[1001];
 char gender[1001];
-vector<Edge> v;
 
-int Find(int now)
+int Find(int node)
 {
-    if (now == parent[now])
-        return now;
-    return parent[now] = Find(parent[now]);
+    if (node == parent[node])
+        return node;
+
+    return parent[node] = Find(parent[node]);
 }
 
 void Union(int a, int b)
 {
-    int pa = Find(a);
-    int pb = Find(b);
-    if (pa == pb)
+    int rootA = Find(a);
+    int rootB = Find(b);
+
+    if (rootA == rootB)
         return;
-    parent[pb] = pa;
+
+    parent[rootB] = rootA;
 }
 
 int kruskal()
 {
-    sort(v.begin(), v.end(), cmp);
-    int sum = 0;
-    int cnt = 0;
-    for (int i = 0; i < v.size(); i++)
+    int totalcost = 0;
+    int cntEdge = 0;
+    sort(edges, edges + M, cmp);
+
+    for (int i = 0; i < M; i++)
     {
-        Edge now = v[i];
-        if (Find(now.a) == Find(now.b))
+        Edge now = edges[i];
+
+        if (Find(now.from) == Find(now.to) || gender[now.from] == gender[now.to])
             continue;
-        if (gender[now.a] == gender[now.b])
-            continue;
-        cnt++;
-        sum += now.cost;
-        Union(now.a, now.b);
+
+        totalcost += now.cost;
+        cntEdge++;
+
+        Union(now.from, now.to);
+
+        if (cntEdge == N - 1)
+            break;
     }
-    if (cnt == N - 1)
-        return sum;
-    else
-        return -1;
+    if (cntEdge == N - 1)
+    {
+        return totalcost;
+    }
+    return -1;
 }
 
 int main()
 {
+    freopen("input.txt", "r", stdin);
     cin >> N >> M;
 
-    // parent 초기화
-    for (int i = 0; i <= N; i++)
-        parent[i] = i;
-
     for (int i = 1; i <= N; i++)
-        cin >> gender[i];
+    {
+        char sex;
+        cin >> sex;
+
+        gender[i] = sex;
+
+        // parent 초기화 해주기!!!!! 이거 때문에 디버깅 해야 했음
+        parent[i] = i;
+    }
 
     for (int i = 0; i < M; i++)
     {
-        int a, b, cost;
-        cin >> a >> b >> cost;
-        v.push_back({a, b, cost});
+        int from, to, cost;
+
+        cin >> from >> to >> cost;
+
+        // if (gender[from] == gender[to])
+        //     continue;
+
+        edges[i] = {from, to, cost};
     }
 
     cout << kruskal();
 }
+
+// #################### kruskal with better time complexity #######################
+// #include <iostream>
+// #include <vector>
+// #include <algorithm>
+// using namespace std;
+
+// struct Edge
+// {
+//     int a, b, cost;
+// };
+
+// bool cmp(Edge left, Edge right)
+// {
+//     if (left.cost < right.cost)
+//         return true;
+//     if (left.cost > right.cost)
+//         return false;
+//     return false;
+// }
+
+// int N, M;
+// int parent[1001];
+// char gender[1001];
+// vector<Edge> v;
+
+// int Find(int now)
+// {
+//     if (now == parent[now])
+//         return now;
+//     return parent[now] = Find(parent[now]);
+// }
+
+// void Union(int a, int b)
+// {
+//     int pa = Find(a);
+//     int pb = Find(b);
+//     if (pa == pb)
+//         return;
+//     parent[pb] = pa;
+// }
+
+// int kruskal()
+// {
+//     sort(v.begin(), v.end(), cmp);
+//     int sum = 0;
+//     int cnt = 0;
+//     for (int i = 0; i < v.size(); i++)
+//     {
+//         Edge now = v[i];
+//         if (Find(now.a) == Find(now.b))
+//             continue;
+//         if (gender[now.a] == gender[now.b])
+//             continue;
+//         cnt++;
+//         sum += now.cost;
+//         Union(now.a, now.b);
+//     }
+//     if (cnt == N - 1)
+//         return sum;
+//     else
+//         return -1;
+// }
+
+// int main()
+// {
+//     cin >> N >> M;
+
+//     // parent 초기화
+//     for (int i = 0; i <= N; i++)
+//         parent[i] = i;
+
+//     for (int i = 1; i <= N; i++)
+//         cin >> gender[i];
+
+//     for (int i = 0; i < M; i++)
+//     {
+//         int a, b, cost;
+//         cin >> a >> b >> cost;
+//         v.push_back({a, b, cost});
+//     }
+
+//     cout << kruskal();
+// }
