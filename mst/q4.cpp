@@ -109,9 +109,35 @@ void bfs(Node start)
 
         if (board[now.y][now.x] == 'A' || board[now.y][now.x] == 'S')
         {
-            edges.push_back({
-                start.num,
-            })
+            int tonum = 0;
+            for (int i = 0; i < nodes.size(); i++)
+            {
+                Node cur = nodes[i];
+
+                if (cur.y == now.y && cur.x == now.x)
+                {
+                    tonum = cur.num;
+                    break;
+                }
+            }
+            edges.push_back({start.num, tonum, now.num});
+        }
+
+        int ydir[4] = {-1, 0, 1, 0};
+        int xdir[4] = {0, -1, 0, 1};
+
+        for (int i = 0; i < 4; i++)
+        {
+            int ny = now.y + ydir[i];
+            int nx = now.x + xdir[i];
+
+            if (ny < 0 || nx < 0 || ny >= Y || nx >= X)
+                continue;
+
+            if (board[ny][nx] == '#')
+                continue;
+
+            q.push({ny, nx, now.num + 1});
         }
     }
 }
