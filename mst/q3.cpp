@@ -114,7 +114,7 @@ bool cmp(Edge a, Edge b)
 
 int N, M;
 int parent[1001];
-Edge edges[1001];
+Edge edges[10001]; // indexing 조심하기!!! 이것 때문에 디버깅 해야 했음 (runtime error가 나오면 거의 대부분 인덱싱 문제임)
 char gender[1001];
 
 int Find(int node)
@@ -142,16 +142,25 @@ int kruskal()
     int cntEdge = 0;
     sort(edges, edges + M, cmp);
 
+    int validEdges = 0;
+    for (int i = 0; i < M; i++)
+    {
+        if (gender[edges[i].from] != gender[edges[i].to])
+            validEdges++;
+    }
+
+    if (validEdges < N - 1)
+        return -1;
+
     for (int i = 0; i < M; i++)
     {
         Edge now = edges[i];
-
-        if (Find(now.from) == Find(now.to) || gender[now.from] == gender[now.to])
+        if (Find(now.from) == Find(now.to))
             continue;
-
+        if (gender[now.from] == gender[now.to])
+            continue;
         totalcost += now.cost;
         cntEdge++;
-
         Union(now.from, now.to);
 
         if (cntEdge == N - 1)
@@ -166,7 +175,7 @@ int kruskal()
 
 int main()
 {
-    freopen("input.txt", "r", stdin);
+    // freopen("input.txt", "r", stdin);
     cin >> N >> M;
 
     for (int i = 1; i <= N; i++)
@@ -180,17 +189,20 @@ int main()
         parent[i] = i;
     }
 
-    for (int i = 0; i < M; i++)
+    int originalM = M;
+    int edgeCnt = 0;
+    for (int i = 0; i < originalM; i++)
     {
         int from, to, cost;
 
         cin >> from >> to >> cost;
 
-        // if (gender[from] == gender[to])
-        //     continue;
+        if (gender[from] == gender[to])
+            continue;
 
-        edges[i] = {from, to, cost};
+        edges[edgeCnt++] = {from, to, cost};
     }
+    M = edgeCnt;
 
     cout << kruskal();
 }
