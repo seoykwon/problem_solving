@@ -48,9 +48,10 @@ void bfs(int y, int x)
 
 int main()
 {
-    freopen("input.txt", "r", stdin);
+    // freopen("input.txt", "r", stdin);
     memset(ppl, 0, sizeof(ppl));
     cin >> width >> height;
+    // cout << height << " " << width << endl;
 
     for (int i = 0; i < height; i++)
     {
@@ -71,7 +72,7 @@ int main()
     cin >> sx >> sy;
     // cout << sy << " " << sx << endl;
 
-    bfs(sy, sx);
+    bfs(sy - 1, sx - 1);
 
     for (int i = 0; i < height; i++)
     {
