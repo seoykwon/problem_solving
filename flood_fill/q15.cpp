@@ -45,14 +45,24 @@ void bfs(int y, int x){
             if (board[ny][nx] == 'M'){
                 bomb++;
             }
-            else {
-                visited[ny][nx] = true;
-                q.push({ny, nx});
-            }
+            // else {
+            //     visited[ny][nx] = true;
+            //     q.push({ny, nx});
+            // }
         }
 
         if (bomb == 0){
             res[now.y][now.x] = 'B';
+            for (int i = 0; i < 8; i++){
+                int ny = now.y + ydir[i];
+                int nx = now.x + xdir[i];
+
+                if (ny < 0 || nx < 0 || ny >= N || nx >= M || visited[ny][nx]) continue;
+                // if (res[ny][nx] >= '0' && res[ny][nx] <= '9') continue;
+
+                visited[ny][nx] = true;
+                q.push({ny, nx});
+            }
         }
         else {
             // cout << bomb << endl;
