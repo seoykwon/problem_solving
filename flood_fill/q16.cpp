@@ -132,10 +132,10 @@ int main()
     vector<vector<bool>> visited(N, vector<bool>(M, false));
 
     // 변화량을 기록할 배열 (스위핑 기법)
-    vector<int> flower_changes(1000001, 0);
+    vector<int> flower_changes(2000002, 0);
 
     // 꽃이 피는 첫 위치를 큐에 넣고, 방문 처리
-    q.push({0, {start_x, start_y}});
+    q.push({1, {start_x, start_y}});
     visited[start_x][start_y] = true;
 
     // BFS 시작
@@ -189,4 +189,92 @@ int main()
 
     return 0;
 }
-// runtime error -> possible excessive memory usage
+
+// 강사님 코드
+#include <iostream>
+#include <queue>
+#define MAXN 500
+#define MAXDAY 1000000
+#define DAT_SIZE (MAXN * MAXN) + MAXDAY + 1
+using namespace std;
+
+struct Node
+{
+    int r, c;
+    int day;
+    int age;
+};
+
+void input();
+int N, M;
+int MAP[MAXN][MAXN];
+int visited[MAXN][MAXN];
+int start_r, start_c;
+int startDay[DAT_SIZE];
+int endDay[DAT_SIZE];
+int dr[] = {-1, 1, 0, 0};
+int dc[] = {0, 0, -1, 1};
+
+int main()
+{
+    input();
+
+    queue<Node> qu;
+    visited[start_r][start_c] = 1;
+    qu.push({start_r, start_c, 1, 1});
+
+    while (!qu.empty())
+    {
+        Node now = qu.front();
+        startDay[now.day]++;
+        endDay[now.day + MAP[now.r][now.c]]++;
+        qu.pop();
+
+        for (int t = 0; t < 4; t++)
+        {
+            int nr = now.r + dr[t];
+            int nc = now.c + dc[t];
+
+            if (nr < 0 || nc < 0 || nr >= N || nc >= M)
+                continue;
+            if (MAP[nr][nc] == 0 || visited[nr][nc])
+                continue;
+
+            visited[nr][nc] = 1;
+            qu.push({nr, nc, now.day + 1, 1});
+        }
+    }
+
+    int ansDay = -1;
+    int maxSize = -1;
+    int cnt = 0;
+    for (int i = 1; i < DAT_SIZE; i++)
+    {
+        cnt += startDay[i];
+        cnt -= endDay[i];
+        if (maxSize < cnt)
+        {
+            ansDay = i;
+            maxSize = cnt;
+        }
+    }
+
+    cout << ansDay << "일" << endl;
+    cout << maxSize << "개" << endl;
+
+    return 0;
+}
+
+void input()
+{
+    cin >> N >> M;
+    for (int r = 0; r < N; r++)
+    {
+        for (int c = 0; c < M; c++)
+        {
+            cin >> MAP[r][c];
+        }
+    }
+    cin >> start_r >> start_c;
+}
+}
