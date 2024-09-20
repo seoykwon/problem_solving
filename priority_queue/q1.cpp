@@ -27,6 +27,7 @@ priority_queue<node, vector<node>, cmp> pq;
 int yd[4] = {1, 0, -1, 0};
 int xd[4] = {0, -1, 0, 1};
 // memset(field, 0, sizeof(field));
+// you are not supposed to use memset in global field. only local field
 
 void explode()
 {
@@ -80,67 +81,67 @@ int main()
 }
 
 // #####################################
-#include <queue>
-#include <iostream>
+// #include <queue>
+// #include <iostream>
 
-using namespace std;
+// using namespace std;
 
-int MAP[1000][1000];
-priority_queue<pair<int, pair<int, int>>> pq;
+// int MAP[1000][1000];
+// priority_queue<pair<int, pair<int, int>>> pq;
 
-void setBoom(int num)
-{
-    int row, col;
-    cin >> row >> col;
-    pq.push({-num, {row, col}});
-}
+// void setBoom(int num)
+// {
+//     int row, col;
+//     cin >> row >> col;
+//     pq.push({-num, {row, col}});
+// }
 
-void activeBoom()
-{
-    int num;
-    pair<int, int> pos;
+// void activeBoom()
+// {
+//     int num;
+//     pair<int, int> pos;
 
-    do
-    {
-        if (pq.empty())
-        {
-            cout << -1 << endl;
-            return;
-        }
-        num = -pq.top().first;
-        pos = pq.top().second;
-        pq.pop();
-    } while (MAP[pos.first][pos.second]);
-    int dr[] = {-1, 1, 0, 0, 0};
-    int dc[] = {0, 0, -1, 1, 0};
+//     do
+//     {
+//         if (pq.empty())
+//         {
+//             cout << -1 << endl;
+//             return;
+//         }
+//         num = -pq.top().first;
+//         pos = pq.top().second;
+//         pq.pop();
+//     } while (MAP[pos.first][pos.second]);
+//     int dr[] = {-1, 1, 0, 0, 0};
+//     int dc[] = {0, 0, -1, 1, 0};
 
-    for (int i = 0; i < 5; i++)
-    {
-        int nr = pos.first + dr[i];
-        int nc = pos.second + dc[i];
+//     for (int i = 0; i < 5; i++)
+//     {
+//         int nr = pos.first + dr[i];
+//         int nc = pos.second + dc[i];
 
-        if (nr < 0 || nc < 0 || nr >= 1000 || nc >= 1000)
-            continue;
+//         if (nr < 0 || nc < 0 || nr >= 1000 || nc >= 1000)
+//             continue;
 
-        MAP[nr][nc] = num;
-    }
-    cout << num << endl;
-}
+//         MAP[nr][nc] = num;
+//     }
+//     cout << num << endl;
+// }
 
-int main()
-{
-    ios_base::sync_with_stdio(false);
-    cin.tie();
-    cout.tie();
-    int N, M;
-    cin >> N >> M;
-    for (int i = 0; i < N + M; i++)
-    {
-        int type;
-        cin >> type;
-        if (type)
-            setBoom(type);
-        else
-            activeBoom();
-    }
-}
+// int main()
+// {
+//     ios_base::sync_with_stdio(false);
+//     cin.tie();
+//     cout.tie();
+//     int N, M;
+//     cin >> N >> M;
+//     for (int i = 0; i < N + M; i++)
+//     {
+//         int type;
+//         cin >> type;
+//         if (type)
+//             setBoom(type);
+//         else
+//             activeBoom();
+//     }
+// }
