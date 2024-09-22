@@ -277,4 +277,3 @@ void input()
     }
     cin >> start_r >> start_c;
 }
-}
