@@ -10,11 +10,21 @@ int M[5];
 char cmd[5][51];
 int res[5];
 
+// 0 = L
+// 1 = R
 int dir[4][2] = {
     {1, 3},
     {2, 0},
     {3, 1},
     {0, 2}};
+
+// 0 = y
+// 1 = x
+int go[4][2] = {
+    {-1, 0},
+    {0, -1},
+    {1, 0},
+    {0, 1}};
 
 void explore()
 {
@@ -41,6 +51,16 @@ void explore()
             }
             else if (alphabet == 'A')
             {
+                int pos = field[cy][cx];
+                cy = cy + go[pos][0];
+                cx = cx + go[pos][1];
+
+                if (field[cy][cx] < 0)
+                {
+                    continue;
+                }
+
+                field[cy][cx] = pos;
             }
         }
     }
