@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 int T, N, Q;
@@ -31,6 +32,7 @@ void explore()
     for (int tc = 0; tc < Q; tc++)
     {
         int len = M[tc];
+        int cd = 0;
 
         cy = sy;
         cx = sx;
@@ -41,27 +43,36 @@ void explore()
 
             if (alphabet == 'R')
             {
-                int cd = field[cy][cx];
-                field[cy][cx] = dir[cd][1];
+                // int cd = field[cy][cx];
+                // field[cy][cx] = dir[cd][1];
+                cd = dir[cd][1];
             }
             else if (alphabet == 'L')
             {
-                int cd = field[cy][cx];
-                field[cy][cx] = dir[cd][0];
+                // int cd = field[cy][cx];
+                // field[cy][cx] = dir[cd][0];
+                cd = dir[cd][0];
             }
             else if (alphabet == 'A')
             {
-                int pos = field[cy][cx];
-                cy = cy + go[pos][0];
-                cx = cx + go[pos][1];
+                int ny = cy + go[cd][0];
+                int nx = cx + go[cd][1];
 
-                if (field[cy][cx] < 0)
+                if (field[ny][nx] == -1)
                 {
                     continue;
                 }
 
-                field[cy][cx] = pos;
+                if (ny < 0 || nx < 0 || ny >= N || nx >= N)
+                    continue;
+
+                cy = ny;
+                cx = nx;
             }
+        }
+        if (cy == dy && cx == dx)
+        {
+            res[tc] = 1;
         }
     }
 }
@@ -110,11 +121,13 @@ int main()
         }
 
         cin >> Q;
-        for (int qc = 1; qc <= Q; qc++)
+        for (int qc = 0; qc < Q; qc++)
         {
             cin >> M[qc];
 
             cin >> cmd[qc];
+
+            // cout << "cmd: " << cmd[qc] << " ";
         }
 
         explore();
@@ -127,3 +140,7 @@ int main()
         cout << endl;
     }
 }
+
+// key debugging issues:
+// 1. separate direction variables : the cd var maintains the current facing dir of the car
+// 2. boundary checking before movement: the potential next pos is checked before moving to it
