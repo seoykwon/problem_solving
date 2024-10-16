@@ -35,7 +35,7 @@ int water()
 
     while (1)
     {
-        if (abs(two - one) == 1)
+        if (abs(two - one) == 1 || abs(two - one) == 0)
         {
             break;
         }
@@ -43,12 +43,20 @@ int water()
         one += 2;
     }
 
+    if (abs(two - one) == 0)
+    {
+        return one + two;
+    }
+    if (one == 1 && two == 0)
+    {
+        return 1;
+    }
     return (one + two + 1);
 }
 
 int main()
 {
-    freopen("input.txt", "r", stdin);
+    // freopen("input.txt", "r", stdin);
 
     cin >> T;
 
