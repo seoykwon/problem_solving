@@ -1,82 +1,82 @@
-// #include <iostream>
-// #include <algorithm>
+#include <iostream>
+#include <algorithm>
 
-// using namespace std;
+using namespace std;
 
-// struct Edge
-// {
-//     int from;
-//     int to;
-//     int cost;
+struct Edge
+{
+    int from;
+    int to;
+    int cost;
 
-//     bool operator<(Edge right) const
-//     {
-//         if (cost < right.cost)
-//             return true;
-//         if (cost > right.cost)
-//             return false;
-//         return false;
-//     }
-// };
+    bool operator<(Edge right) const
+    {
+        if (cost < right.cost)
+            return true;
+        if (cost > right.cost)
+            return false;
+        return false;
+    }
+};
 
-// Edge edges[10001];
-// int parent[10001];
+Edge edges[10001];
+int parent[10001];
 
-// int Find(int A)
-// {
-//     if (A == parent[A])
-//     {
-//         return A;
-//     }
-//     return parent[A] = Find(parent[A]);
-// }
+int Find(int A)
+{
+    if (A == parent[A])
+    {
+        return A;
+    }
+    return parent[A] = Find(parent[A]);
+}
 
-// void Union(int A, int B)
-// {
-//     int rootA = Find(A);
-//     int rootB = Find(B);
+void Union(int A, int B)
+{
+    int rootA = Find(A);
+    int rootB = Find(B);
 
-//     if (rootA == rootB)
-//         return;
+    if (rootA == rootB)
+        return;
 
-//     parent[rootB] = parent[rootA];
-// }
+    parent[rootB] = parent[rootA];
+}
 
-// int main()
-// {
-//     int V, E;
-//     cin >> V >> E;
+int main()
+{
+    int V, E;
+    cin >> V >> E;
 
-//     for (int i = 0; i < E; i++)
-//     {
-//         int from, to, cost;
+    for (int i = 0; i < E; i++)
+    {
+        int from, to, cost;
 
-//         cin >> from >> to >> cost;
+        cin >> from >> to >> cost;
 
-//         edges[i] = {from, to, cost};
-//     }
+        edges[i] = {from, to, cost};
+    }
 
-//     sort(edges, edges + E);
+    sort(edges, edges + E);
 
-//     for (int i = 0; i <= V; i++)
-//     {
-//         parent[i] = i;
-//     }
+    for (int i = 0; i <= V; i++)
+    {
+        parent[i] = i;
+    }
 
-//     int sum = 0;
+    int sum = 0;
 
-//     // 3. connect one by one
-//     for (int i = 0; i < E; i++)
-//     {
-//         Edge now = edges[i]; // choose the smallest weighted edge that is located in the front
-//         if (Find(now.from) == Find(now.to))
-//             continue;
-//         Union(now.from, now.to); // 하나씩 연결
-//         sum += now.cost;
-//     }
+    // 3. connect one by one
+    for (int i = 0; i < E; i++)
+    {
+        Edge now = edges[i]; // choose the smallest weighted edge that is located in the front
+        if (Find(now.from) == Find(now.to))
+            continue;
+        Union(now.from, now.to); // 하나씩 연결
+        sum += now.cost;
+    }
 
-//     cout << sum;
-// }
+    cout << sum;
+}
 
 // ############### KRUSKAL ################################
 
@@ -160,71 +160,71 @@ int main()
 
 // ################### PRIM #############################
 
-// #include <iostream>
-// #include <vector>
-// #include <queue>
-// using namespace std;
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
 
-// struct Edge
-// {
-//     int to;
-//     int cost;
+struct Edge
+{
+    int to;
+    int cost;
 
-//     bool operator<(Edge next) const
-//     {
-//         if (cost < next.cost)
-//             return false;
-//         if (cost > next.cost)
-//             return true;
-//         return false;
-//     }
-// };
+    bool operator<(Edge next) const
+    {
+        if (cost < next.cost)
+            return false;
+        if (cost > next.cost)
+            return true;
+        return false;
+    }
+};
 
-// int N, M;
-// vector<Edge> al[10001];
-// int connected[100001];
+int N, M;
+vector<Edge> al[10001];
+int connected[100001];
 
-// int prim(int start)
-// {
-//     priority_queue<Edge> pq;
-//     pq.push({start, 0});
+int prim(int start)
+{
+    priority_queue<Edge> pq;
+    pq.push({start, 0});
 
-//     int sum = 0;
+    int sum = 0;
 
-//     while (!pq.empty())
-//     {
-//         Edge now = pq.top();
-//         pq.pop();
+    while (!pq.empty())
+    {
+        Edge now = pq.top();
+        pq.pop();
 
-//         if (connected[now.to] == 1)
-//             continue;
+        if (connected[now.to] == 1)
+            continue;
 
-//         connected[now.to] = 1;
-//         sum += now.cost;
+        connected[now.to] = 1;
+        sum += now.cost;
 
-//         for (int i = 0; i < al[now.to].size(); i++)
-//         {
-//             Edge next = al[next.to][i];
-//             if (connected[next.to] == 1)
-//                 continue;
-//             pq.push(next);
-//         }
-//     }
-//     return sum;
-// }
+        for (int i = 0; i < al[now.to].size(); i++)
+        {
+            Edge next = al[next.to][i];
+            if (connected[next.to] == 1)
+                continue;
+            pq.push(next);
+        }
+    }
+    return sum;
+}
 
-// int main()
-// {
-//     cin >> N >> M;
+int main()
+{
+    cin >> N >> M;
 
-//     for (int i = 0; i < M; i++)
-//     {
-//         int from, to, cost;
-//         cin >> from >> to >> cost;
-//         al[from].push_back({to, cost});
-//         al[to].push_back({from, cost});
-//     }
+    for (int i = 0; i < M; i++)
+    {
+        int from, to, cost;
+        cin >> from >> to >> cost;
+        al[from].push_back({to, cost});
+        al[to].push_back({from, cost});
+    }
 
-//     // start wherever you want
-//     cout << prim(1);
-// }
+    // start wherever you want
+    cout << prim(1);
+}

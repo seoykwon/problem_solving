@@ -1,93 +1,93 @@
-// #include <iostream>
-// #include <queue>
-// #include <vector>
+#include <iostream>
+#include <queue>
+#include <vector>
 
-// using namespace std;
+using namespace std;
 
-// struct Edge
-// {
-//     int to;
-//     int cost;
+struct Edge
+{
+    int to;
+    int cost;
 
-//     bool operator<(Edge right) const
-//     {
-//         if (cost < right.cost)
-//             return false;
-//         if (cost > right.cost)
-//             return true;
-//         return false;
-//     }
-// };
+    bool operator<(Edge right) const
+    {
+        if (cost < right.cost)
+            return false;
+        if (cost > right.cost)
+            return true;
+        return false;
+    }
+};
 
-// vector<Edge> v[1001];
-// int visited[1001] = {
-//     0,
-// };
-// char gender[1001];
-// int N, M;
+vector<Edge> v[1001];
+int visited[1001] = {
+    0,
+};
+char gender[1001];
+int N, M;
 
-// int prim(int start)
-// {
-//     priority_queue<Edge> pq;
-//     pq.push({start, 0});
-//     int cnt = 0;
-//     int totalcost = 0;
+int prim(int start)
+{
+    priority_queue<Edge> pq;
+    pq.push({start, 0});
+    int cnt = 0;
+    int totalcost = 0;
 
-//     while (!pq.empty())
-//     {
-//         Edge now = pq.top();
-//         pq.pop();
+    while (!pq.empty())
+    {
+        Edge now = pq.top();
+        pq.pop();
 
-//         if (visited[now.to])
-//             continue;
-//         visited[now.to] = 1;
-//         cnt++;
-//         totalcost += now.cost;
+        if (visited[now.to])
+            continue;
+        visited[now.to] = 1;
+        cnt++;
+        totalcost += now.cost;
 
-//         for (int i = 0; i < v[now.to].size(); i++)
-//         {
-//             Edge next = v[now.to][i];
+        for (int i = 0; i < v[now.to].size(); i++)
+        {
+            Edge next = v[now.to][i];
 
-//             if (visited[next.to])
-//                 continue;
+            if (visited[next.to])
+                continue;
 
-//             pq.push({next.to, next.cost});
-//         }
-//     }
-//     if (cnt == N)
-//     {
-//         return totalcost;
-//     }
-//     return -1;
-// }
+            pq.push({next.to, next.cost});
+        }
+    }
+    if (cnt == N)
+    {
+        return totalcost;
+    }
+    return -1;
+}
 
-// int main()
-// {
-//     // freopen("input.txt", "r", stdin);
-//     cin >> N >> M;
+int main()
+{
+    // freopen("input.txt", "r", stdin);
+    cin >> N >> M;
 
-//     for (int i = 1; i <= N; i++)
-//     {
-//         char sex;
-//         cin >> sex;
+    for (int i = 1; i <= N; i++)
+    {
+        char sex;
+        cin >> sex;
 
-//         gender[i] = sex;
-//     }
+        gender[i] = sex;
+    }
 
-//     for (int i = 0; i < M; i++)
-//     {
-//         int from, to, cost;
-//         cin >> from >> to >> cost;
+    for (int i = 0; i < M; i++)
+    {
+        int from, to, cost;
+        cin >> from >> to >> cost;
 
-//         if (gender[from] == gender[to])
-//             continue;
+        if (gender[from] == gender[to])
+            continue;
 
-//         v[from].push_back({to, cost});
-//         v[to].push_back({from, cost});
-//     }
+        v[from].push_back({to, cost});
+        v[to].push_back({from, cost});
+    }
 
-//     cout << prim(1);
-// }
+    cout << prim(1);
+}
 
 // ################### kruskal #######################
 #include <iostream>

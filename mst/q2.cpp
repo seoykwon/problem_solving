@@ -1,138 +1,138 @@
-// #include <iostream>
-// #include <algorithm>
-// #include <vector>
-// #include <queue>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
 
-// using namespace std;
+using namespace std;
 
-// struct pos
-// {
-//     int y, x;
-// };
+struct pos
+{
+    int y, x;
+};
 
-// struct Edge
-// {
-//     int from;
-//     int to;
-//     int cost;
+struct Edge
+{
+    int from;
+    int to;
+    int cost;
 
-//     // bool operator<(Edge right) const
-//     // {
-//     //     if (cost < right.cost)
-//     //         return false;
-//     //     if (cost > right.cost)
-//     //         return true;
-//     //     return false;
-//     // }
-// };
+    // bool operator<(Edge right) const
+    // {
+    //     if (cost < right.cost)
+    //         return false;
+    //     if (cost > right.cost)
+    //         return true;
+    //     return false;
+    // }
+};
 
-// bool cmp(Edge a, Edge b)
-// {
-//     if (a.cost < b.cost)
-//         return true;
-//     if (a.cost > b.cost)
-//         return false;
-//     return false;
-// }
+bool cmp(Edge a, Edge b)
+{
+    if (a.cost < b.cost)
+        return true;
+    if (a.cost > b.cost)
+        return false;
+    return false;
+}
 
-// pos edges[2001];
-// int parent[2001 * 2];
-// vector<Edge> v;
-// int ans = 0;
+pos edges[2001];
+int parent[2001 * 2];
+vector<Edge> v;
+int ans = 0;
 
-// int Find(int node)
-// {
-//     if (node == parent[node])
-//     {
-//         return node;
-//     }
+int Find(int node)
+{
+    if (node == parent[node])
+    {
+        return node;
+    }
 
-//     return parent[node] = Find(parent[node]);
-// }
+    return parent[node] = Find(parent[node]);
+}
 
-// void Union(int a, int b)
-// {
-//     int rootA = Find(a);
-//     int rootB = Find(b);
+void Union(int a, int b)
+{
+    int rootA = Find(a);
+    int rootB = Find(b);
 
-//     if (rootA == rootB)
-//         return;
+    if (rootA == rootB)
+        return;
 
-//     parent[rootB] = rootA;
-// }
+    parent[rootB] = rootA;
+}
 
-// void kruskal(int N)
-// {
-//     sort(v.begin(), v.end(), cmp);
-//     int edgesUsed = 0;
+void kruskal(int N)
+{
+    sort(v.begin(), v.end(), cmp);
+    int edgesUsed = 0;
 
-//     for (int i = 0; i < v.size(); i++)
-//     {
-//         Edge now = v[i];
+    for (int i = 0; i < v.size(); i++)
+    {
+        Edge now = v[i];
 
-//         if (Find(now.from) == Find(now.to))
-//             continue;
+        if (Find(now.from) == Find(now.to))
+            continue;
 
-//         ans += now.cost;
-//         Union(now.from, now.to);
-//         edgesUsed++;
-//         // MST가 완성되면 룹에서 꺼내줘야 함. time limit exceed
-//         if (edgesUsed == N - 1)
-//             break;
-//     }
+        ans += now.cost;
+        Union(now.from, now.to);
+        edgesUsed++;
+        // MST가 완성되면 룹에서 꺼내줘야 함. time limit exceed
+        if (edgesUsed == N - 1)
+            break;
+    }
 
-//     // loop을 돌려서 모든 밭이 이어져 있는지 확인하면 시간이 추가됨
-//     // 만약 모든 밭을 잇는 관개 시스템 설치 불가 -1
-//     if (edgesUsed != N - 1)
-//     {
-//         ans = -1;
-//     }
-// }
+    // loop을 돌려서 모든 밭이 이어져 있는지 확인하면 시간이 추가됨
+    // 만약 모든 밭을 잇는 관개 시스템 설치 불가 -1
+    if (edgesUsed != N - 1)
+    {
+        ans = -1;
+    }
+}
 
-// int main()
-// {
-//     // freopen("input.txt", "r", stdin);
-//     int N, K;
-//     cin >> N >> K;
+int main()
+{
+    // freopen("input.txt", "r", stdin);
+    int N, K;
+    cin >> N >> K;
 
-//     for (int i = 0; i < N; i++)
-//     {
-//         parent[i] = i;
-//     }
+    for (int i = 0; i < N; i++)
+    {
+        parent[i] = i;
+    }
 
-//     for (int i = 0; i < N; i++)
-//     {
-//         int y, x;
-//         cin >> y >> x;
+    for (int i = 0; i < N; i++)
+    {
+        int y, x;
+        cin >> y >> x;
 
-//         edges[i].y = y;
-//         edges[i].x = x;
-//     }
+        edges[i].y = y;
+        edges[i].x = x;
+    }
 
-//     // calculate each edge's cost
-//     for (int i = 0; i < N; i++)
-//     {
-//         for (int j = 0; j < N; j++)
-//         {
-//             if (i == j)
-//                 continue;
+    // calculate each edge's cost
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            if (i == j)
+                continue;
 
-//             pos a = edges[i];
-//             pos b = edges[j];
+            pos a = edges[i];
+            pos b = edges[j];
 
-//             int dist = (a.y - b.y) * (a.y - b.y) + (a.x - b.x) * (a.x - b.x);
-//             if (dist < K)
-//                 continue;
+            int dist = (a.y - b.y) * (a.y - b.y) + (a.x - b.x) * (a.x - b.x);
+            if (dist < K)
+                continue;
 
-//             // cout << "adding into the vector!" << endl;
-//             v.push_back({i, j, dist});
-//         }
-//     }
+            // cout << "adding into the vector!" << endl;
+            v.push_back({i, j, dist});
+        }
+    }
 
-//     kruskal(N);
+    kruskal(N);
 
-//     cout << ans;
-// }
+    cout << ans;
+}
 
 // ####################### PRIM ################################
 #include <iostream>
