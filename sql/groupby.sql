@@ -156,8 +156,22 @@ FROM BOOK AS B
 WHERE CATEGORY = '인문' AND YEAR(PUBLISHED_DATE)
 ORDER BY PUBLISHED_DATE ASC
 -- 신기한 점. "%Y-%M" 이라고 하면 월이 영문으로 나옴. m으로 해야 숫자 월이 나옴
+-- %y라고 하면 년도의 뒤에 두자리 숫자만 나옴
 
 SELECT COUNT(*) AS COUNT
 FROM ECOLI_DATA
 WHERE (GENOTYPE & 2) = 0  -- 2번 형질이 없는 경우 (2진수에서 2는 10₍₂₎)
 AND (GENOTYPE & 1 <> 0 OR GENOTYPE & 4 <> 0);  -- 1번 형질(1₍₂₎) 또는 3번 형질(100₍₂₎)이 있는 경우
+
+SELECT U.USER_ID, U.NICKNAME, SUM(B.PRICE) AS TOTAL_SALES
+FROM USED_GOODS_BOARD AS B
+JOIN USED_GOODS_USER AS U ON B.WRITER_ID = U.USER_ID
+WHERE B.STATUS = 'DONE'
+-- AND SUM(PRICE) >= 700000
+GROUP BY U.USER_ID
+HAVING SUM(PRICE) >= 700000
+ORDER BY TOTAL_SALES
+
+-- invalid use of group function은 where 절에서 sum 같은 집계 함수가 사용됐을 때 발생해 
+-- WHERE 절은 집계 함수의 결과를 필터링할 수 없기 때문에, 집계 후에 조건을 적용해야 합니다. 
+-- 이를 위해 HAVING 절을 사용해야 합니다.
