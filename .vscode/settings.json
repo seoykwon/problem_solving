@@ -10,7 +10,10 @@
     "limits": "cpp",
     "xutility": "cpp",
     "climits": "cpp",
-    "string": "cpp"
+    "string": "cpp",
+    "xstring": "cpp",
+    "list": "cpp",
+    "unordered_map": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
