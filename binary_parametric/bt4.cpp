@@ -109,6 +109,12 @@ int main()
     int N;
     cin >> N;
 
+    if (N == 1)
+    {
+        cout << 1 << '\n';
+        return 0;
+    }
+
     psearch(N);
     return 0;
 }
