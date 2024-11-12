@@ -118,3 +118,38 @@ int main()
     psearch(N);
     return 0;
 }
+
+// ################ 강사님 코드 #####################
+#include <iostream>
+#include <algorithm>
+using namespace std;
+int N;
+
+int root(int n)
+{
+    int st = 1;
+    int ed = 10000;
+    int ret = -1;
+    while (st <= ed)
+    {
+        int mid = (st + ed) / 2;
+        if (mid * mid <= n)
+        {
+            ret = mid;
+            st = mid + 1;
+        }
+        else
+        {
+            ed = mid - 1;
+        }
+    }
+    return ret;
+}
+
+int main()
+{
+    cin >> N;
+    cout << root(N);
+
+    return 0;
+}
