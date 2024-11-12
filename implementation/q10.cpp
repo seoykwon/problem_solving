@@ -25,7 +25,8 @@ pair<int, int> maxPoint(const vector<vector<int>> &block)
     {
         for (int j = 0; j < 4; j++)
         {
-            if (green[i][j] == 1)
+            // green[i][j] 가 아님..
+            if (block[i][j] == 1)
             {
                 y = max(y, i);
                 x = max(x, j);
@@ -93,43 +94,62 @@ vector<vector<int>> rotate(const vector<vector<int>> &block)
 
 bool fitting(int y, int x, vector<vector<int>> &block)
 {
-    pair<int, int> maxRC = maxPoint(block);
+    // 초록색 도형의 최상단, 좌측 가장자리를 구합니다
+    pair<int, int> minRC = minPoint(block); // 도형의 최소 위치
+    pair<int, int> maxRC = maxPoint(block); // 도형의 최대 위치
 
-    int f = maxRC.first;
-    int s = maxRC.second;
-
-    for (int i = 0; i <= f; i++)
+    // 배치할 수 있는 공간이 판의 범위 내에 있는지 확인
+    if (y + maxRC.first > 9 || x + maxRC.second > 9)
     {
-        for (int j = 0; j <= s; j++)
+        return false; // 도형이 판 밖으로 벗어날 경우
+    }
+
+    // 배치할 공간에 벽이나 다른 도형이 있는지 확인
+    for (int i = 0; i <= maxRC.first - minRC.first; i++)
+    {
+        for (int j = 0; j <= maxRC.second - minRC.second; j++)
         {
             if (block[i][j] == 1)
-            {
-                if (board[y + i][x + j] != 0 || used[y + i][x + j])
+            { // 초록색 블럭이 있을 경우
+                if (board[y + i][x + j] == -1)
                 {
-                    return false;
+                    return false; // 해당 칸에 이미 도형이 있거나 벽이 있을 경우
                 }
             }
         }
     }
 
-    // reaching here means that the block fits in
-    for (int i = 0; i <= f; i++)
+    // 배치 가능한 경우, 해당 공간을 사용 표시
+    for (int i = 0; i <= maxRC.first - minRC.first; i++)
     {
-        for (int j = 0; j <= s; j++)
+        for (int j = 0; j <= maxRC.second - minRC.second; j++)
         {
             if (block[i][j] == 1)
             {
-                used[y + i][x + j] = 1;
+                used[y + i][x + j] = 1; // 해당 칸을 사용했다고 표시
             }
         }
     }
 
-    return true;
+    return true; // 도형을 배치할 수 있음
+}
+
+// Function to print a 4x4 block
+void printBlock(const vector<vector<int>> &block)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            cout << block[i][j] << " ";
+        }
+        cout << endl;
+    }
 }
 
 int main()
 {
-    freopen("input.txt", "r", stdin);
+    // freopen("input.txt", "r", stdin);
 
     for (int i = 0; i < 4; i++)
     {
@@ -157,18 +177,36 @@ int main()
 
     shapeVariation[0] = green;
 
-    for (int i = 1; i <= 3; i++)
+    for (int i = 1; i < 4; i++)
     {
         shapeVariation[i] = rotate(shapeVariation[i - 1]);
+        shift(shapeVariation[i]);
     }
 
+    // // Print out all the rotated variations for debugging
+    // cout << "Shape variations after rotation:" << endl;
+    // for (int i = 0; i < 5; i++)
+    // {
+    //     cout << "Rotation " << i << ":" << endl;
+    //     printBlock(shapeVariation[i]);
+    // }
+
     // now find all the empty spots in the board that can fit in the green shapes
-    for (int i = 0; i <= 10 - 4; i++)
+    for (int i = 0; i < 10; i++)
     {
-        for (int j = 0; j <= 10 - 4; j++)
+        for (int j = 0; j < 10; j++)
         {
             for (int idx = 0; idx < 4; idx++)
             {
+                if (idx == 2 && shapeVariation[0] == shapeVariation[2])
+                    continue;
+
+                if (idx == 3 && shapeVariation[1] == shapeVariation[3])
+                    continue;
+
+                if (idx == 1 && shapeVariation[0] == shapeVariation[1])
+                    continue;
+
                 if (fitting(i, j, shapeVariation[idx]))
                 {
                     cnt++;
@@ -178,6 +216,15 @@ int main()
     }
 
     cout << cnt << '\n';
+
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     for (int j = 0; j < 10; j++)
+    //     {
+    //         cout << used[i][j] << " ";
+    //     }
+    //     cout << '\n';
+    // }
 
     return 0;
 }
