@@ -33,14 +33,24 @@ void Union(int A, int B)
     parent[rootB] = rootA;
 }
 
+// 비교군을 끝나는 시점으로 해야 함. 회의실 배정처럼. 시작점으로 정렬하면 제대로 유니온이 안될 수 있음.
 bool cmp(lumber a, lumber b)
 {
-    return a.x1 < b.x1;
+    // if (a.x2 < b.x2)
+    //     return true;
+    // if (a.x2 > b.x2)
+    //     return false;
+    // if (a.x1 < b.x1)
+    //     return true;
+    // if (a.x1 > b.x1)
+    //     return false;
+    // return false;
+    return a.x2 < b.x2;
 }
 
 int main()
 {
-    freopen("input.txt", "r", stdin);
+    // freopen("input.txt", "r", stdin);
     int N, Q;
     cin >> N >> Q;
 
