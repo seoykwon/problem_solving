@@ -36,16 +36,9 @@ void Union(int A, int B)
 // 비교군을 끝나는 시점으로 해야 함. 회의실 배정처럼. 시작점으로 정렬하면 제대로 유니온이 안될 수 있음.
 bool cmp(lumber a, lumber b)
 {
-    // if (a.x2 < b.x2)
-    //     return true;
-    // if (a.x2 > b.x2)
-    //     return false;
-    // if (a.x1 < b.x1)
-    //     return true;
-    // if (a.x1 > b.x1)
-    //     return false;
-    // return false;
-    return a.x2 < b.x2;
+    if (a.x1 == b.x1)
+        return a.x2 < b.x2;
+    return a.x1 < b.x1;
 }
 
 int main()
@@ -68,17 +61,22 @@ int main()
     }
     sort(lumbers.begin(), lumbers.end(), cmp);
 
+    int curX2 = lumbers[0].x2;
+
     // use union find. if lumbers are connected, unionize.
-    for (int i = 0; i < N - 1; i++)
+    for (int i = 1; i < N; i++)
     {
         lumber a = lumbers[i];
-        lumber b = lumbers[i + 1];
 
-        // union
-        if (b.x1 <= a.x2)
+        if (a.x1 <= curX2)
         {
-            Union(a.num, b.num);
+            Union(a.num, lumbers[i - 1].num);
         }
+        curX2 = max(curX2, lumbers[i].x2);
+        // 이 부분 구현을 안 하면 틀림
+        // x2값을 맥스로 계속 유지해야 함
+        // 바로 전 통나무랑 지금 통나무만 비교하면 안 됨.
+        // 디버깅 할 때 유의하기
     }
 
     for (int i = 0; i < Q; i++)
