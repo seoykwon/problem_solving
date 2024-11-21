@@ -7,8 +7,6 @@ int n;
 int cnt = 0;
 int row[11];
 
-int dir[4][2] = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
-
 void search(int num)
 {
     if (num == n)
