@@ -53,6 +53,7 @@ vector<string> find_shortest_unique_code(const vector<string> &queries)
     }
 
     // 모든 코드의 길이를 min_length로 맞추기
+    // 만약 원본 문자열의 길이가 min_length보다 작으면 이제 _ 를 넣어주는 논리
     for (auto &code : codes)
     {
         if (code.size() < min_length)
