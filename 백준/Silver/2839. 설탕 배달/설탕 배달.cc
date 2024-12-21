@@ -1,22 +1,22 @@
 #include <iostream>
+
 using namespace std;
-int dp[5001]; //global 변수이기때문에 0으로 초기화된 배열
 
 int main() {
-	int n;
-	cin >> n;
-	//3kg와 5kg를 만드는 가장 최소의 봉지수는 1
-	//따라서 dp[3]과 dp[5]는 무조건 1
-	dp[3] = dp[5] = 1;	
+    int n;
+    cin >> n;
 
-	//3과 5 다음인 6부터 for loop 순회
-	for (int i = 6; i <= n; i++) {
-		if (dp[i - 3]) dp[i] = dp[i - 3] + 1;
+    int result = -1; // 결과를 초기화 (-1은 실패의 의미)
+    
+    // 5킬로그램 봉지를 최대한 사용하며, 남은 설탕을 3킬로그램 봉지로 나눌 수 있는지 확인
+    for (int i = n / 5; i >= 0; i--) {
+        int remaining = n - (i * 5); // 5킬로그램 봉지로 처리한 후 남은 설탕
+        if (remaining % 3 == 0) {    // 남은 설탕이 3으로 나누어 떨어지는 경우
+            result = i + (remaining / 3); // 봉지의 총 개수
+            break; // 가장 적은 봉지로 해결되므로 루프 종료
+        }
+    }
 
-		//이미 dp[i-3]에 값이 존재할때 dp[i]가 업데이트 됐었을 수 있다.
-		//만약 dp[i]에 값이 없다면 dp[i] = dp[i-5] +1 로 업데이트
-		if (dp[i - 5]) dp[i] = dp[i] ? min(dp[i] , dp[i - 5] + 1) : dp[i - 5] + 1;
-	}
-	cout << (dp[n] == 0 ? -1 : dp[n]) << endl;
-	return 0;
+    cout << result << '\n'; // 결과 출력
+    return 0;
 }
