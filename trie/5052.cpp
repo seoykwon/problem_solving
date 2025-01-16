@@ -47,7 +47,6 @@ struct Trie
 };
 
 char input[100000][11];
-vector<string> book;
 
 int main()
 {
@@ -66,7 +65,6 @@ int main()
         for (int i = 0; i < n; i++)
         {
             cin >> input[i];
-            book.push_back(input[i]);
             root->insert(input[i]);
         }
 
