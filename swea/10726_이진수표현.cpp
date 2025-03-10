@@ -4,26 +4,28 @@ using namespace std;
 
 int main()
 {
-    // freopen("input.txt", "r", stdin);
+    freopen("sample_input.txt", "r", stdin);
     int tc;
     cin >> tc;
 
-    for (int i = 1; i <= tc; i++)
+    for (int t = 1; t <= tc; t++)
     {
-        int N, M;
-        cin >> N >> M;
+        int n, m;
+        cin >> n >> m;
 
-        // int bit = ((1 << (N + 1)) - 1) & M;
-        int bit = ((1 << N) - 1) & M;
+        // n + 1 이동이 아니라 n 이동이다
+        int bit = (1 << n) - 1;
+        int chk = (bit & m);
+        // & (비트 and)
+        // |= (비트 OR)
 
-        // if (bit == ((1 << (N + 1)) - 1))
-        if (bit == ((1 << N) - 1))
+        if (chk == bit)
         {
-            cout << "#" << i << " " << "ON" << '\n';
+            cout << "#" << t << " " << "ON" << "\n";
         }
         else
         {
-            cout << "#" << i << " " << "OFF" << '\n';
+            cout << "#" << t << " " << "OFF" << "\n";
         }
     }
 }
