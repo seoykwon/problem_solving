@@ -1,214 +1,159 @@
-// implementation
 #include <iostream>
-#include <algorithm>
-#include <queue>
-#include <stack>
-#include <unordered_map>
-#define NM 100005
+#include <vector>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
-string X;
-int n, Q, L;
-struct NODE
+struct Node
 {
-    int v;
-    NODE *prev;
-    NODE *next;
-    NODE() {}
-    NODE(int v, NODE *prev, NODE *next) : v(v), prev(prev), next(next) {}
-} *head;
-int cnt;
+    int data;
+    Node *next;
 
-void input()
+    Node(int data) : data(data), next(nullptr) {}
+};
+
+class LinkedList
 {
-    cin >> n >> Q >> L;
-    NODE *cur = head;
-    for (int i = 1; i <= n; i++)
+    Node *head, *tail;
+    int nodeCnt;
+
+public:
+    LinkedList() : head(nullptr), tail(nullptr), nodeCnt(0) {}
+
+    void push_back(int data)
     {
-        int x;
-        cin >> x;
-        if (i == 1)
+        Node *newNode = new Node(data);
+        if (!head)
         {
-            head = new NODE(x, 0, 0);
-            cur = head;
+            head = tail = newNode;
         }
         else
         {
-            cur->next = new NODE(x, cur, 0);
+            tail->next = newNode;
+            tail = newNode;
+        }
+        nodeCnt++;
+    }
+
+    void insert(int idx, int data)
+    {
+        Node *newNode = new Node(data);
+        if (idx == 0)
+        {
+            newNode->next = head;
+            head = newNode;
+            if (!tail)
+                tail = newNode;
+        }
+        else
+        {
+            Node *cur = head;
+            for (int i = 0; i < idx - 1; i++)
+                cur = cur->next;
+            newNode->next = cur->next;
+            cur->next = newNode;
+            if (newNode->next == nullptr)
+                tail = newNode; // tail 업데이트
+        }
+        nodeCnt++;
+    }
+
+    void erase(int idx)
+    {
+        if (idx == 0)
+        {
+            Node *temp = head;
+            head = head->next;
+            delete temp;
+            if (!head)
+                tail = nullptr; // 리스트가 비면 tail도 nullptr로 설정
+        }
+        else
+        {
+            Node *cur = head;
+            for (int i = 0; i < idx - 1; i++)
+                cur = cur->next;
+            Node *temp = cur->next;
+            cur->next = temp->next;
+            if (cur->next == nullptr)
+                tail = cur; // tail 업데이트
+            delete temp;
+        }
+        nodeCnt--;
+    }
+
+    void change(int idx, int data)
+    {
+        Node *cur = head;
+        for (int i = 0; i < idx; i++)
             cur = cur->next;
-        }
-        cnt++;
+        cur->data = data;
     }
-}
 
-void pro()
-{
-    while (Q--)
+    int get(int idx)
     {
-        char ch;
-        cin >> ch;
-        if (ch == 'C')
-        {
-            NODE *cur = head;
-            int y, s;
-            cin >> y >> s;
-            for (int i = 1; i <= y; i++)
-            {
-                cur = cur->next;
-            }
-            cur->v = s;
-        }
-        else if (ch == 'I')
-        {
-            int x, y;
-            cin >> x >> y;
-            x--;
-            if (x == -1)
-            {
-                if (cnt > 0)
-                {
-                    NODE *newNode = new NODE(y, 0, head);
-                    head->prev = newNode;
-                    head = newNode;
-                }
-                else
-                    head = new NODE(y, 0, 0);
-            }
-            else
-            {
-                NODE *cur = head;
-                while (x--)
-                    cur = cur->next;
-                NODE *node = new NODE(y, cur, cur->next);
-                if (cur->next)
-                    cur->next->prev = node;
-                cur->next = node;
-            }
-            cnt++;
-        }
-        else if (ch == 'D')
-        {
-            int x;
-            cin >> x;
-            NODE *cur = head;
-            while (x--)
-                cur = cur->next;
-            NODE *prev = cur->prev, *next = cur->next;
-            if (prev)
-                prev->next = next;
-            if (next)
-                next->prev = prev;
-            if (prev == NULL)
-                head = next;
-            cnt--;
-        }
+        Node *cur = head;
+        for (int i = 0; i < idx; i++)
+            cur = cur->next;
+        return cur->data;
     }
-    NODE *cur = head;
-    for (int i = 1; i <= L; i++)
+
+    int size()
     {
-        if (cur == NULL)
-            break;
-        cur = cur->next;
+        return nodeCnt;
     }
-    if (cur == NULL)
-        cout << -1 << "\n";
-    else
-        cout << cur->v << "\n";
-}
+};
 
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
-    int TT;
-    cin >> TT;
-    for (int tt = 1; tt <= TT; tt++)
-    {
-        input();
-        cout << "#" << tt << " ";
-        pro();
-    }
-    return 0;
-}
-
-// arraylist
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <list>
-
-using namespace std;
-
-int main()
-{
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-
+    // freopen("sample_input.txt", "r", stdin);
     int T;
     cin >> T;
 
     for (int tc = 1; tc <= T; tc++)
     {
-        int n, m, tgtIdx;
-        cin >> n >> m >> tgtIdx;
+        int n, m, l;
+        cin >> n >> m >> l;
 
-        list<int> linkedList;
-
+        LinkedList list;
         for (int i = 0; i < n; i++)
         {
-            int num;
-            cin >> num;
-            linkedList.push_back(num);
+            int tmp;
+            cin >> tmp;
+            list.push_back(tmp);
         }
 
         for (int i = 0; i < m; i++)
         {
-            string cmd;
+            char cmd;
+            int idx, val;
             cin >> cmd;
-
-            if (cmd == "I")
+            if (cmd == 'I')
             {
-                int x, y;
-                cin >> x >> y;
-
-                auto it = linkedList.begin();
-                advance(it, x);
-                linkedList.insert(it, y);
+                cin >> idx >> val;
+                list.insert(idx, val);
             }
-            else if (cmd == "D")
+            else if (cmd == 'D')
             {
-                int x;
-                cin >> x;
-
-                auto it = linkedList.begin();
-                advance(it, x);
-                linkedList.erase(it);
+                cin >> idx;
+                list.erase(idx);
             }
-            else if (cmd == "C")
+            else if (cmd == 'C')
             {
-                int x, y;
-                cin >> x >> y;
-
-                auto it = linkedList.begin();
-                advance(it, x);
-                *it = y;
+                cin >> idx >> val;
+                list.change(idx, val);
             }
         }
 
-        if (linkedList.size() > tgtIdx)
+        if (l >= list.size())
         {
-            auto it = linkedList.begin();
-            advance(it, tgtIdx);
-            cout << "#" << tc << " " << *it << "\n";
+            cout << "#" << tc << " -1\n";
         }
         else
         {
-            cout << "#" << tc << " " << -1 << "\n";
+            cout << "#" << tc << " " << list.get(l) << "\n";
         }
     }
-
     return 0;
 }
