@@ -13,61 +13,61 @@ using namespace std;
 
 struct Table
 {
-    int joker;
-    int begin, end;
-    int cards[MAX_CARD * 2 + 5];
-    deque<int> idxList[20][20];
-    // idxList[joker][score] := 조커의 점수가 joker일 때, 점수가 score인 인덱스 리스트
-    // 예를 들어, 현재 joker = 9점이고, findNumber의 타겟 점수가 19 점이라면,
-    // 우리는 idxList[9][19] => 원하는 인덱스 리스트를 바로 알 수 있다.
+    int joker;                   // 현재 조커의 점수
+    int begin, end;              // 카드가 놓인 시작점과 끝점
+    int cards[MAX_CARD * 2 + 5]; // 테이블 위 카드 배열
+    deque<int> idxList[20][20];  // idxList[joker][score]: 특정 조커 값에서 점수별 카드 시작 인덱스 리스트
 
-    void updateIdx(int idx, int mdir) // [idx ~ (idx + 3)] 의 네 장의 점수를 mdir 방향에 추가한다.
+    // 네 장의 카드 점수를 기반으로 idxList 갱신
+    void updateIdx(int idx, int mdir)
     {
-        int sum = 0;       // 조커 이외의 총점
-        int joker_cnt = 0; // 조커 개수
+        int sum = 0;       // 조커를 제외한 점수 총합
+        int joker_cnt = 0; // 조커 개수 확인
         for (int i = 0; i < 4; i++)
         {
-            if (cards[idx + i] == -1)
+            if (cards[idx + i] == -1) // 조커라면
                 joker_cnt++;
             else
-                sum += cards[idx + i];
+                sum += cards[idx + i]; // 조커가 아니라면 점수 누적
         }
 
-        for (int i = 0; i < 20; i++) // 조커의 점수를 i 로 가정해보자
+        // 조커의 점수를 가능한 모든 값(0~29)로 가정하여 점수 조합 계산
+        for (int i = 0; i < 30; i++)
         {
-            int num = (sum + (joker_cnt * i)) % 20;
-            if (mdir == 0) // 왼쪽
+            int num = (sum + (joker_cnt * i)) % 20; // 최종 점수 계산
+            if (mdir == 0)                          // 왼쪽에서 추가되었으면 앞쪽에 삽입
                 idxList[i][num].push_front(idx);
-            else // 오른쪽
+            else // 오른쪽에서 추가되었으면 뒤쪽에 삽입
                 idxList[i][num].push_back(idx);
         }
     }
 
-    void init(int mJoker, int mNumbers[5]) // 초기 5장과 조커로 초기화하기
+    // 게임 초기화 함수
+    void init(int mJoker, int mNumbers[5])
     {
-        joker = mJoker % 20;    // 조커 점수를 20으로 나눈 나머지로 초기화하기
-        begin = end = MAX_CARD; // 카드들의 처음, 끝 위치 초기화하기
-        for (int i = 0; i < 20; i++)
+        begin = end = MAX_CARD; // 카드 시작점을 중앙으로 설정
+        for (int i = 0; i < 30; i++)
         {
             for (int j = 0; j < 20; j++)
             {
-                idxList[i][j].clear();
+                idxList[i][j].clear(); // idxList 초기화
             }
         }
         for (int i = 0; i < 5; i++)
         {
-            cards[end + i] = mNumbers[i];
+            cards[end + i] = mNumbers[i]; // 초기 카드 배치
         }
         end += 5;
         for (int i = 0; i < 2; i++)
         {
-            updateIdx(MAX_CARD + i, 1);
+            updateIdx(MAX_CARD + i, 1); // 초기 카드의 점수 조합 저장
         }
     }
 
-    void push_front(int mNumbers[5]) // 새로운 5 장을 왼쪽에 놓기
+    // 왼쪽에 새로운 카드 5장 추가
+    void push_front(int mNumbers[5])
     {
-        begin -= 5;
+        begin -= 5; // 왼쪽으로 확장
         for (int i = 0; i < 5; i++)
         {
             cards[begin + i] = mNumbers[i];
@@ -75,11 +75,12 @@ struct Table
         int target = begin;
         for (int i = 4; i >= 0; i--)
         {
-            updateIdx(target + i, 0);
+            updateIdx(target + i, 0); // 새로 추가된 카드 점수 갱신
         }
     }
 
-    void push_back(int mNumbers[5]) // 새로운 5 장을 오른쪽에 놓기
+    // 오른쪽에 새로운 카드 5장 추가
+    void push_back(int mNumbers[5])
     {
         for (int i = 0; i < 5; i++)
         {
@@ -89,19 +90,21 @@ struct Table
         end += 5;
         for (int i = 0; i < 5; i++)
         {
-            updateIdx(target + i, 1);
+            updateIdx(target + i, 1); // 새로 추가된 카드 점수 갱신
         }
     }
 
-    int find(int mNum, int mNth) // mNum 점수 중에 mNth 번째 위치 찾기
+    // 특정 점수(mNum)에서 mNth 번째 조합을 찾기
+    int find(int mNum, int mNth)
     {
-        auto &list = idxList[joker][mNum];
-        if (mNth > list.size())
+        auto &list = idxList[joker][mNum]; // 현재 조커 값에서 특정 점수의 카드 인덱스 리스트 참조
+        if (mNth > list.size())            // 요청한 번째가 리스트 크기를 초과하면 실패
             return -1;
-        return list[mNth - 1];
+        return list[mNth - 1]; // mNth 번째 인덱스 반환
     }
 
-    void changeJoker(int mJoker) // 조커 점수 바꾸기
+    // 조커 점수 변경
+    void changeJoker(int mJoker)
     {
         joker = mJoker % 20;
     }
@@ -133,7 +136,7 @@ int findNumber(int mNum, int mNth, int ret[4])
         return 0;
     for (int i = 0; i < 4; i++)
     {
-        ret[i] = t.cards[idx + i];
+        ret[i] = t.cards[idx + i]; // 해당 위치의 4장 복사
     }
     return 1;
 }
