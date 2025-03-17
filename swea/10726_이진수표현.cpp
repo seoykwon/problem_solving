@@ -4,28 +4,33 @@ using namespace std;
 
 int main()
 {
-    freopen("sample_input.txt", "r", stdin);
-    int tc;
-    cin >> tc;
+    // freopen("sample_input.txt", "r", stdin);
+    int T;
+    cin >> T;
 
-    for (int t = 1; t <= tc; t++)
+    for (int tc = 1; tc <= T; tc++)
     {
-        int n, m;
-        cin >> n >> m;
+        int N, M;
+        cin >> N >> M;
 
-        // n + 1 이동이 아니라 n 이동이다
-        int bit = (1 << n) - 1;
-        int chk = (bit & m);
-        // & (비트 and)
-        // |= (비트 OR)
+        int check = (1 << N) - 1;
 
-        if (chk == bit)
+        // if (M &= check == check)
+        /**
+         * 위 코드를 연산자 우선순위에 따라 해석하면
+         * M &= (check == check)로 동작해.
+         * check == check는 항상 1이야.
+         * 따라서 M &= 1이 실행되고, M값이 변경돼
+         * 이 후 if (M)이 평가되는데, M이 0이 아니면 true, 0이면 false가 돼
+         * 그런데 안에 bitwise구문에 괄호 안 쳐주면 오답이야
+         */
+        if ((M & check) == check)
         {
-            cout << "#" << t << " " << "ON" << "\n";
+            cout << "#" << tc << " " << "ON" << "\n";
         }
         else
         {
-            cout << "#" << t << " " << "OFF" << "\n";
+            cout << "#" << tc << " " << "OFF" << "\n";
         }
     }
 }
