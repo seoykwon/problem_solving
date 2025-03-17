@@ -1,38 +1,36 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 int main()
 {
-    freopen("sample_input.txt", "r", stdin);
+    // freopen("sample_input.txt", "r", stdin);
     int T;
     cin >> T;
-    int total = (1 << 10) - 1;
+
+    // int check = (1 << 9) - 1;
+    int check = (1 << 10) - 1;
 
     for (int tc = 1; tc <= T; tc++)
     {
         int N;
         cin >> N;
 
-        int visited = 0;
-        int count = 0;
+        int mul = 0;
+        int seenDigits = 0;
 
-        while (1)
+        while (seenDigits != check)
         {
-            // N * count 값을 문자열로 표현한 것것
-            string strNum = to_string(N * (++count));
+            mul++;
+            int sheep = N * mul;
 
-            for (char c : strNum)
+            string str = to_string(sheep);
+            for (char c : str)
             {
-                int num = c - '0';
-                visited |= (1 << num);
+                seenDigits |= (1 << (c - '0'));
             }
-
-            if (visited == total)
-                break;
         }
-
-        cout << "#" << tc << " " << N * count << "\n";
+        cout << "#" << tc << " " << mul * N << "\n";
     }
-
-    return 0;
 }
