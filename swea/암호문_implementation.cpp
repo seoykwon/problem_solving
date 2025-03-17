@@ -85,7 +85,7 @@ public:
             return;
         }
 
-        for (int i = 1; i < idx; i++)
+        for (int i = 0; i < cnt; i++)
         {
             cur = cur->next;
         }
@@ -125,15 +125,10 @@ public:
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-
-    int T = 10;
-
-    for (int t = 1; t <= T; t++)
+    freopen("input.txt", "r", stdin);
+    for (int tc = 1; tc <= 10; tc++)
     {
         LinkedList list;
-        cout << "#" << t << " ";
 
         int N;
         cin >> N;
@@ -161,7 +156,6 @@ int main()
             case 'I':
                 cin >> x >> y;
                 temp = vector<int>(y);
-
                 for (int j = 0; j < y; j++)
                 {
                     cin >> temp[j];
