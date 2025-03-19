@@ -56,7 +56,7 @@ void dfs(Trie *trie, int depth, int test_case)
             }
 
             results[depth] = i;
-            dfs(trie->children[i], depth + 1; test_case);
+            dfs(trie->children[i], depth + 1, test_case);
             results[depth] = '\0';
         }
     }
