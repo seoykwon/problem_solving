@@ -7,13 +7,9 @@ using namespace std;
 class Trie
 {
 public:
-    // 이 정점으로 이동하는 알파벳
     char alphabet;
-    // 이 정점에서 끝나는 문자열이 존재하는 지 표현
     bool isWordEnd;
-    // 이 정점을 root로 하는 subtree에 포함된 문자열 개수
     int cnt;
-    // 각 문자에 대해 이동하는 다른 정점을 기억하는 map
     map<char, Trie *> children;
 
     Trie(char alphabet) : alphabet(alphabet), isWordEnd(false), cnt(0) {}
@@ -22,9 +18,9 @@ public:
 };
 
 int K;
-char results[101];
+char results[401];
 
-void dfs(Trie *trie, int depth, int test_case)
+void dfs(Trie *trie, int depth, int tc)
 {
     if (K == 0)
         return;
@@ -34,13 +30,16 @@ void dfs(Trie *trie, int depth, int test_case)
         K--;
         if (K == 0)
         {
-            string result = "";
-            for (int i = 0; i < depth; i++)
+            if (trie->cnt < K)
             {
-                result += results[i];
+                string result = "";
+                for (int i = 0; i < depth; i++)
+                {
+                    result += results[i];
+                }
+                cout << "#" << tc << " " << result << endl;
+                return;
             }
-            cout << "#" << test_case << " " << result << "\n";
-            return;
         }
     }
 
@@ -56,60 +55,51 @@ void dfs(Trie *trie, int depth, int test_case)
             }
 
             results[depth] = i;
-            dfs(trie->children[i], depth + 1; test_case);
+            dfs(trie->children[i], depth + 1, tc);
             results[depth] = '\0';
         }
     }
 }
 
-void print(const string &str, int test_case)
-{
-    cout << "#" << test_case << " " << str << "\n";
-}
-
 int main()
 {
-    ios_base::sync_with_stdio(false);
+    ios::sync_with_stdio(false);
     cin.tie(0);
 
+    freopen("input.txt", "r", stdin);
     int T;
     cin >> T;
 
-    for (int test_case = 1; test_case <= T; test_case++)
+    for (int tc = 1; tc <= T; tc++)
     {
-        Trie *head = new Trie();
         cin >> K;
-        string words;
-        cin >> words;
-        int len = words.length();
+        string word;
+        cin >> word;
 
-        if (K > len)
-        {
-            print("none", test_case);
-            continue;
-        }
+        int len = word.length();
+
+        Trie *head = new Trie();
 
         for (int i = 0; i < len; i++)
         {
-            Trie *indexTrie = head;
+            Trie *idx = head;
 
             for (int j = 0; j < len; j++)
             {
-                char alphabet = words[j];
+                char alphabet = word[j];
 
-                if (indexTrie->children.find(alphabet) == indexTrie->children.end())
+                if (idx->children.find(alphabet) == idx->children.end())
                 {
                     Trie *newTrie = new Trie(alphabet);
-                    indexTrie->children[alphabet] = newTrie;
+                    idx->children[alphabet] = newTrie;
                 }
-                indexTrie = indexTrie->children[alphabet];
-                indexTrie->cnt++;
+                idx = idx->children[alphabet];
+                idx->cnt++;
             }
-            indexTrie->isWordEnd = true;
+            idx->isWordEnd = true;
         }
         results[len] = '\0';
-        dfs(head, 0, test_case);
+        dfs(head, 0, tc);
         delete head;
     }
-    return 0;
 }
