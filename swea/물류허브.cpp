@@ -61,7 +61,6 @@ int init(int N, int sCity[], int eCity[], int mCost[])
     id2idx.clear();
     int idx = 0;
 
-    // index 압축 과정
     for (int i = 0; i < N; i++)
     {
         if (id2idx.find(sCity[i]) == id2idx.end())
@@ -85,7 +84,6 @@ int init(int N, int sCity[], int eCity[], int mCost[])
         fwdList[id2idx[sCity[i]]].emplace_back(id2idx[eCity[i]], mCost[i]);
         revList[id2idx[eCity[i]]].emplace_back(id2idx[sCity[i]], mCost[i]);
     }
-
     return Num;
 }
 
