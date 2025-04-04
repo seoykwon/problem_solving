@@ -58,12 +58,8 @@ struct List
 void init()
 {
     for (int i = MIN_TEAM; i <= MAX_TEAM; i++)
-    {
         for (int j = MIN_SCORE; j <= MAX_SCORE; j++)
-        {
             soldierGroup[i][j].initialize();
-        }
-    }
 }
 
 void hire(int mID, int mTeam, int mScore)

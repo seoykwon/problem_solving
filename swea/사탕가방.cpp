@@ -34,6 +34,8 @@ int main()
         {
             long long mid = (low + high) / 2;
 
+            // 가방을 mid 개 만큼 만들 것이라고 결정했다.
+            // 각 가방에 최대 몇 개의 사탕을 넣을 수 있는 지
             long long sum = 0LL;
             for (int i = 0; i < N; i++)
             {
@@ -50,7 +52,9 @@ int main()
                 low = mid + 1;
             }
         }
+
         cout << "#" << tc << " " << ans << "\n";
     }
+
     return 0;
 }
