@@ -1,13 +1,23 @@
 #include <iostream>
-#include <queue>
 #include <vector>
+#include <string>
+#include <sstream>
+#include <cstring>
+#include <queue>
 
 using namespace std;
 
-int map[300][300];
+int map[301][301];
 int ans, N;
 const int dr[] = {-1, 1, 0, 0, -1, -1, 1, 1};
 const int dc[] = {0, 0, -1, 1, 1, -1, -1, 1};
+
+void init()
+{
+    memset(map, 0, sizeof(map));
+    // memset(visited, 0, sizeof(visited));
+    ans = 0;
+}
 
 bool isZero(int r, int c)
 {
@@ -17,7 +27,7 @@ bool isZero(int r, int c)
         int nc = c + dc[i];
         if (nr < 0 || nc < 0 || nr >= N || nc >= N)
             continue;
-        if (map[nr][nc] == -2)
+        if (map[nr][nc] == 1)
             return false;
     }
     return true;
@@ -39,23 +49,22 @@ void click(int r, int c)
         {
             int nr = curr.first + dr[i];
             int nc = curr.second + dc[i];
-
-            if (nr < 0 || nc < 0 || nr >= N || nc >= N || map[nr][nc] != -1)
+            if (nr < 0 || nc < 0 || nr >= N || nc >= N || map[nr][nc] != 2)
                 continue;
+            map[nr][nc] = 0;
             if (isZero(nr, nc))
                 q.push({nr, nc});
-            map[nr][nc] = 0;
         }
     }
 }
 
-void solve()
+int solve()
 {
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
         {
-            if (map[i][j] != -1)
+            if (map[i][j] != 2)
                 continue;
             if (isZero(i, j))
             {
@@ -64,45 +73,49 @@ void solve()
             }
         }
     }
-
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
         {
-            if (map[i][j] == -1)
+            if (map[i][j] == 2)
                 ans++;
         }
     }
+    return ans;
 }
 
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
 
+    // freopen("input.txt", "r", stdin);
     int T;
     cin >> T;
 
     for (int tc = 1; tc <= T; tc++)
     {
-        cin >> N;
-        ans = 0;
+        init();
 
+        cin >> N;
+        cin.ignore();
+
+        string line;
         for (int i = 0; i < N; i++)
         {
-            string str;
-            cin >> str;
+            getline(cin, line);
 
+            stringstream st(line);
             for (int j = 0; j < N; j++)
             {
-                if (str[j] == '.')
-                    map[i][j] = -1;
-                else
-                    map[i][j] = -2;
+                char tmp;
+                st >> tmp;
+
+                map[i][j] = (tmp == '*') ? 1 : 2;
+                // 1 = 지뢰 2 = 지뢰 아님
             }
         }
-        solve();
+        ans = solve();
         cout << "#" << tc << " " << ans << "\n";
     }
-    return 0;
 }

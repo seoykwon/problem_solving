@@ -19,9 +19,6 @@ int solve()
         {
             mid = (L + R) / 2;
             int blank = (a[mid] - a[i] + 1) - (mid - i + 1); // 빈 날짜 개수
-            // a[mid] - a[i] + 1: 실제 날짜 범위 (ex. 3~7이면 5일)
-            // mid - i + 1: 실제 공부한 날 수 (배열 내 존재하는 원소 개수)
-
             if (blank > p)
             { // 불가능
                 R = mid - 1;
