@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <queue>
+#include <cstring>
 using namespace std;
 
 int ground[51][51];
@@ -53,6 +54,8 @@ struct status
 
 int travel(int r1, int c1, int r2, int c2)
 {
+    memset(visited, 0, sizeof(visited)); // travel() 함수 안에서 수행 필요
+
     // jump
     queue<status> q;
     q.push({r1, c1, 0, 1});
