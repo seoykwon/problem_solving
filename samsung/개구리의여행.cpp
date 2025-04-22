@@ -9,6 +9,18 @@ int ground[51][51];
 int N, Q;
 int dir[4][2] = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
+void printG()
+{
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            cout << ground[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}
+
 struct status
 {
     int y, x;
@@ -21,6 +33,8 @@ int travel(int r1, int c1, int r2, int c2)
 
     // cannot land on (1) slimy rock
     // cannot pass over (2) cousin rock
+
+    return -1;
 }
 
 int main()
@@ -74,5 +88,7 @@ int main()
         int ans = travel(r1, c1, r2, c2);
 
         cout << ans << '\n';
+
+        // printG();
     }
 }
