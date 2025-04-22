@@ -6,12 +6,8 @@ using namespace std;
 
 int N;
 int K;
-// i번째 물건까지 고려했을 때, 부피가 j인 배낭에 담을 수 있는 최대 가치치
 int dp[101][1001];
-// 물건 i를 배낭에 담았는지 여부를 추적하는 배열.
-// 1: 물건 i를 담지 않음. 2: 물건 i를 담음.
 int come[101][1001];
-// 물건의 부피, 가치
 int w[101], v[101];
 int ans;
 
@@ -33,7 +29,6 @@ int main()
             for (int j = 0; j <= K; j++)
             {
                 dp[i][j] = dp[i - 1][j];
-                // 물건 i 담지 않음음
                 come[i][j] = 1;
 
                 if (w[i] <= j)
@@ -41,7 +36,6 @@ int main()
                     if (dp[i][j] < dp[i - 1][j - w[i]] + v[i])
                     {
                         dp[i][j] = dp[i - 1][j - w[i]] + v[i];
-                        // 물건 i 담음음
                         come[i][j] = 2;
                     }
                 }
@@ -64,10 +58,10 @@ int main()
             }
         }
 
-        for (int i = 1; i <= N; i++)
-        {
-            cout << i << "번 물건 사용: " << used[i] << endl;
-        }
+        // for (int i = 1; i <= N; i++)
+        // {
+        //     cout << i << "번 물건 사용: " << used[i] << endl;
+        // }
 
         cout << "#" << testcase << " " << dp[N][K] << endl;
     }

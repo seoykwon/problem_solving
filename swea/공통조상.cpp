@@ -51,7 +51,6 @@ int main()
         {
             nodes[i] = Node();
         }
-
         for (int i = 0; i < M; i++)
         {
             int p, c;

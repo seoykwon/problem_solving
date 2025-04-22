@@ -35,6 +35,7 @@ int main()
             string input;
             getline(cin, input);
             bool flag = false;
+
             for (char c : input)
             {
                 if (flag)
@@ -46,13 +47,11 @@ int main()
                     flag = true;
             }
         }
-
         dfs(1);
         cout << "\n";
 
         delete[] arr;
     }
     cout << result;
-
     return 0;
 }

@@ -1,5 +1,3 @@
-// 돈이 되는 알고리즘
-// 롤링 해쉬, 로빈 카프 rolling hash
 #include <iostream>
 #include <string>
 #include <vector>
@@ -76,7 +74,7 @@ int main()
     cin >> T;
     cin.ignore();
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int testCase = 1; testCase <= T; testCase++)
     {
         string B, S;
         getline(cin, B);
@@ -84,7 +82,7 @@ int main()
 
         int result = getCount(B, S);
 
-        cout << "#" << tc << " " << result << "\n";
+        cout << "#" << testCase << " " << result << "\n";
     }
 
     return 0;

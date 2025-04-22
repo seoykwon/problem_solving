@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -14,6 +15,7 @@ void input()
 {
     cin >> N;
     coreList.clear();
+
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
@@ -43,13 +45,14 @@ int extend(pair<int, int> point, int d)
     while (inRange(r, c))
     {
         if (map[r][c] != 0)
+        {
             return -1;
+        }
         r += dr[d];
         c += dc[d];
     }
     r = point.first + dr[d];
     c = point.second + dc[d];
-
     while (inRange(r, c))
     {
         map[r][c] = 2;
@@ -106,7 +109,7 @@ void backtracking(int idx, int length, int cnt)
 
 void output(int t)
 {
-    cout << "#" << t << " " << ans << "\n";
+    cout << "#" << t << " " << ans << endl;
 }
 
 int main()
@@ -122,6 +125,5 @@ int main()
         backtracking(0, 0, 0);
         output(t);
     }
-
     return 0;
 }
