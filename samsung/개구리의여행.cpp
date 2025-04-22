@@ -12,17 +12,17 @@ int dir[4][2] = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
 void init()
 {
-    for (int i = 0; i <= 51; i++)
+    for (int i = 0; i < 51; i++)
     {
-        for (int j = 0; j <= 51; j++)
+        for (int j = 0; j < 51; j++)
         {
             ground[i][j] = 0;
         }
     }
 
-    for (int i = 0; i <= 51; i++)
+    for (int i = 0; i < 51; i++)
     {
-        for (int j = 0; j <= 51; j++)
+        for (int j = 0; j < 51; j++)
         {
             for (int k = 0; k <= 5; k++)
             {
@@ -109,7 +109,7 @@ int travel(int r1, int c1, int r2, int c2)
             }
 
             visited[ny][nx][jump] = 1;
-            q.push({ny, nx, now.time + (jump * jump)});
+            q.push({ny, nx, now.time + (jump * jump), jump});
 
             // increase jump strength
             if (jump < 5)
