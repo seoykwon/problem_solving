@@ -23,7 +23,7 @@ void print_cost()
 {
     for (int k = 1; k <= 5; k++)
     {
-        cout << "energy: " << k << "\n";
+        cout << "energy : " << k << '\n';
         for (int i = 0; i < N; i++)
         {
             for (int j = 0; j < N; j++)
@@ -35,7 +35,7 @@ void print_cost()
             }
             cout << "\n\n";
         }
-        cout << "......................\n";
+        cout << "............................\n";
     }
     cout << "\n\n";
 }
@@ -95,7 +95,6 @@ void search(int start_r, int start_c)
         {
             bool jumpable = true;
             int n_r = curr_r, n_c = curr_c;
-
             for (int e = 0; e < curr_e; e++)
             {
                 n_r += move_r[m];
@@ -185,8 +184,6 @@ int main()
         clear_cost();
         search(r1 - 1, c1 - 1);
         res_q.push(get_cost(r2 - 1, c2 - 1));
-        // print_cost();
-        // cout << "\n\n========================\n\n";
     }
 
     while (!res_q.empty())
