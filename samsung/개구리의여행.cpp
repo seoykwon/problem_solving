@@ -23,21 +23,26 @@ void print_cost()
 {
     for (int k = 1; k <= 5; k++)
     {
-        cout << "energy :" << k << "\n";
+        cout << "energy : " << k << '\n';
         for (int i = 0; i < N; i++)
         {
             for (int j = 0; j < N; j++)
             {
                 if (cost[k][i][j] != MAX_COST)
-                    cout << cost[k][i][j] << "\t";
+                    cout << cost[k][i][j] << '\t';
                 else
-                    cout << "_\t";
+                    cout << '_\t';
             }
             cout << "\n\n";
         }
-        cout << "........................\n";
+        cout << ".................\n";
     }
     cout << "\n\n";
+}
+
+bool out_map(int r, int c)
+{
+    return (r < 0) || (c < 0) || (r >= N) || (c >= N);
 }
 
 void clear_cost()
@@ -52,37 +57,6 @@ void clear_cost()
             }
         }
     }
-}
-
-void init()
-{
-    char c;
-
-    cin >> N;
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            cin >> c;
-            switch (c)
-            {
-            case '.':
-                map[i][j] = SAFE;
-                break;
-            case 'S':
-                map[i][j] = MONSTER;
-                break;
-            case '#':
-                map[i][j] = WALL;
-                break;
-            }
-        }
-    }
-}
-
-bool out_map(int r, int c)
-{
-    return (r < 0) || (c < 0) || (r >= N) || (c >= N);
 }
 
 void search(int start_r, int start_c)
@@ -155,6 +129,46 @@ void search(int start_r, int start_c)
     }
 }
 
+int get_cost(int dst_r, int dst_c)
+{
+    int min_cost = MAX_COST;
+    for (int e = 1; e <= 5; e++)
+    {
+        if (min_cost > cost[e][dst_r][dst_c])
+        {
+            min_cost = cost[e][dst_r][dst_c];
+        }
+    }
+
+    return (min_cost == MAX_COST) ? -1 : min_cost;
+}
+
+void init()
+{
+    char c;
+
+    cin >> N;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            cin >> c;
+            switch (c)
+            {
+            case '.':
+                map[i][j] = SAFE;
+                break;
+            case 'S':
+                map[i][j] = MONSTER;
+                break;
+            case '#':
+                map[i][j] = WALL;
+                break;
+            }
+        }
+    }
+}
+
 int main()
 {
     int k;
@@ -171,7 +185,7 @@ int main()
         search(r1 - 1, c1 - 1);
         res_q.push(get_cost(r2 - 1, c2 - 1));
         // print_cost();
-        // cout << "\n\n=========================\n\n";
+        // cout << "\n\n=================\n\n";
     }
 
     while (!res_q.empty())
