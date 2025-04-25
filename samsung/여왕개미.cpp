@@ -185,7 +185,6 @@ bool invalid[30001] = {false};
 int N, Q;
 int len = 0;
 int home[30001];
-priority_queue<E> pq;
 
 int bs(int R)
 {
