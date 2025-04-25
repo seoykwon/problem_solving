@@ -171,3 +171,102 @@ int main()
         }
     }
 }
+
+// ###############################
+#include <iostream>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+int S[30001];
+int G[30001];
+bool invalid[30001] = {false};
+
+int N, Q;
+int len = 0;
+int home[30001];
+priority_queue<E> pq;
+
+int bs(int R)
+{
+    int result = 0;
+    int pre = 0;
+    int cnt = 0;
+    int l = 0;
+    int r = 1000000000;
+
+    while (l <= r)
+    {
+        int mid = (l + r) / 2;
+        cnt = 1;
+        for (int i = 0; i < len; i++)
+        {
+            if (!invalid[i])
+            {
+                pre = home[i];
+                break;
+            }
+        }
+
+        for (int i = 0; i < len; i++)
+        {
+            if (invalid[i])
+                continue;
+            if (home[i] - pre > mid)
+            {
+                cnt++;
+                pre = home[i];
+            }
+        }
+
+        if (cnt <= R)
+        {
+            result = mid;
+            r = mid - 1;
+        }
+        else
+        {
+            l = mid + 1;
+        }
+    }
+    return result;
+}
+
+int main()
+{
+    cin >> Q;
+    for (int t = 0; t < Q; t++)
+    {
+        int order;
+        cin >> order;
+        if (order == 100)
+        {
+            cin >> N;
+
+            for (int i = 0; i < N; i++)
+            {
+                int h;
+                cin >> h;
+                home[len++] = h;
+            }
+        }
+        else if (order == 200)
+        {
+            int h;
+            cin >> h;
+            home[len++] = h;
+        }
+        else if (order == 300)
+        {
+            int h;
+            cin >> h;
+            invalid[h - 1] = true;
+        }
+        else if (order == 400)
+        {
+            int r;
+            cin >> r;
+            cout << bs(r) << '\n';
+        }
+    }
+}
