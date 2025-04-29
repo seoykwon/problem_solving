@@ -31,7 +31,7 @@ static char General[MAX_N][MAX_N][MAX_L + 1];
 
 using namespace std;
 
-int n;
+int NN;
 struct pos
 {
     int n;
@@ -68,7 +68,7 @@ void Union(int A, int B)
 
 void init(int N, int mSoldier[25][25], char mMonarch[25][25][11])
 {
-    N = N;
+    NN = N;
     int cnt = 1;
     for (int i = 0; i < N; i++)
     {
@@ -87,7 +87,7 @@ void init(int N, int mSoldier[25][25], char mMonarch[25][25][11])
         }
     }
 
-    for (int i = 1; i <= n * n; i++)
+    for (int i = 1; i <= N * N; i++)
     {
         parent[i] = i;
     }
@@ -182,7 +182,7 @@ int attack(char mMonarchA[11], char mMonarchB[11], char mGeneral[11])
             int ny = curr_y + dir[j][0];
             int nx = curr_x + dir[j][1];
 
-            if (ny >= N || nx >= N || ny < 0 || nx < 0)
+            if (ny >= NN || nx >= NN || ny < 0 || nx < 0)
                 continue;
 
             if (General[ny][nx] == mMonarchB)
@@ -216,7 +216,7 @@ int attack(char mMonarchA[11], char mMonarchB[11], char mGeneral[11])
             int ny = curr_y + dir[j][0];
             int nx = curr_x + dir[j][1];
 
-            if (ny >= N || nx >= N || ny < 0 || nx < 0)
+            if (ny >= NN || nx >= NN || ny < 0 || nx < 0)
                 continue;
 
             int rootE = Find(country.find(General[ny][nx])->second.n);
