@@ -1,0 +1,63 @@
+WITH RECURSIVE TBL AS (
+    SELECT
+        ID,
+        PARENT_ID,
+        1 AS GENERATION
+    FROM
+        ECOLI_DATA
+    WHERE
+        PARENT_ID IS NULL
+
+    UNION ALL
+
+    SELECT
+        e.ID,
+        e.PARENT_ID,
+        GENERATION + 1
+    FROM
+        ECOLI_DATA e INNER JOIN TBL t
+        ON e.PARENT_ID = t.ID
+)
+
+SELECT ID
+FROM TBL
+WHERE GENERATION = 3
+ORDER BY ID ASC;
+
+-- ###############################
+SELECT
+    c.ID
+FROM (
+    SELECT ID,PARENT_ID FROM ECOLI_DATA WHERE PARENT_ID IS NULL) a
+    INNER JOIN ECOLI_DATA b ON a.ID = b.PARENT_ID 
+    INNER JOIN ECOLI_DATA c ON b.ID = c.PARENT_ID
+ORDER BY
+    c.ID ASC;
+
+-- ################################
+WITH TBL AS (
+    SELECT EMP_NO, AVG(SCORE) AS AVG_SCORE
+    FROM HR_GRADE
+    GROUP BY EMP_NO
+)
+
+SELECT 
+    E.EMP_NO,
+    E.EMP_NAME,
+    CASE
+        WHEN T.AVG_SCORE >= 96 THEN 'S'
+        WHEN T.AVG_SCORE >= 90 THEN 'A'
+        WHEN T.AVG_SCORE >= 80 THEN 'B'
+        ELSE 'C'
+    END AS GRADE,
+    CASE
+        WHEN T.AVG_SCORE >= 96 THEN E.SAL * 0.2
+        WHEN T.AVG_SCORE >= 90 THEN E.SAL * 0.15
+        WHEN T.AVG_SCORE >= 80 THEN E.SAL * 0.1
+        ELSE 0
+    END AS BONUS
+FROM
+    HR_EMPLOYEES E
+    INNER JOIN TBL T ON E.EMP_NO = T.EMP_NO
+GROUP BY
+    T.EMP_NO
