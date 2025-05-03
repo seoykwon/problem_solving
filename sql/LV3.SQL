@@ -1,0 +1,90 @@
+SELECT 
+    A.ID,
+    COUNT(B.PARENT_ID) AS CHILD_COUNT
+FROM    
+    ECOLI_DATA A LEFT JOIN ECOLI_DATA B
+    ON A.ID = B.PARENT_ID
+GROUP BY
+    A.ID
+ORDER BY
+    A.ID
+
+-- ###########################
+SELECT 
+    ID,
+    CASE
+        WHEN SIZE_OF_COLONY <= 100 THEN 'LOW'
+        WHEN SIZE_OF_COLONY <= 1000 THEN 'MEDIUM'
+        ELSE 'HIGH'
+    END AS SIZE
+FROM    
+    ECOLI_DATA
+ORDER BY
+    ID
+
+-- ############################
+SELECT
+    ID,
+    CASE
+        WHEN PERCENT_RANK() OVER (ORDER BY SIZE_OF_COLONY DESC) < 0.25 THEN 'CRITICAL'
+        WHEN PERCENT_RANK() OVER (ORDER BY SIZE_OF_COLONY DESC) < 0.5 THEN 'HIGH'
+        WHEN PERCENT_RANK() OVER (ORDER BY SIZE_OF_COLONY DESC) < 0.75 THEN 'MEDIUM'
+        ELSE 'LOW'
+    END AS COLONY_NAME
+FROM
+    ECOLI_DATA
+ORDER BY
+    ID ASC
+
+-- ###########################
+SELECT
+    ID,
+    CASE
+        WHEN NTILE(4) OVER (ORDER BY SIZE_OF_COLONY) = 1 THEN 'LOW'
+        WHEN NTILE(4) OVER (ORDER BY SIZE_OF_COLONY) = 2 THEN 'MEDIUM'
+        WHEN NTILE(4) OVER (ORDER BY SIZE_OF_COLONY) = 3 THEN 'HIGH'
+        ELSE 'CRITICAL'
+    END AS COLONY_NAME
+FROM ECOLI_DATA
+ORDER BY ID ASC;
+
+-- ###########################
+SELECT
+    COUNT(*) FISH_COUNT, 
+    MAX(LENGTH) MAX_LENGTH,
+    FISH_TYPE
+FROM
+    FISH_INFO
+GROUP BY
+    FISH_TYPE
+HAVING
+    AVG(IF(IFNULL(LENGTH, 0) <= 10, 10, LENGTH)) >= 33
+ORDER BY
+    FISH_TYPE
+
+-- ###########################
+SELECT
+    COUNT(*) AS FISH_COUNT,
+    MAX(LENGTH) AS MAX_LENGTH,
+    FISH_TYPE
+FROM
+    FISH_INFO
+WHERE
+    FISH_TYPE IN (
+        SELECT FISH_TYPE
+        FROM (
+            SELECT
+                FISH_TYPE,
+                COALESCE(LENGTH, 10) AS LENGTH
+            FROM
+                FISH_INFO
+            ) AS TBL
+        GROUP BY FISH_TYPE
+        HAVING AVG(LENGTH) >= 33
+    )
+GROUP BY 
+    FISH_TYPE
+ORDER BY
+    FISH_TYPE ASC
+
+-- ###########################
