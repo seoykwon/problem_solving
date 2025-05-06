@@ -61,15 +61,49 @@ int init(int N, int sCity[], int eCity[], int mCost[])
     id2idx.clear();
     int idx = 0;
 
-    return 0;
+    for (int i = 0; i < N; i++)
+    {
+        if (id2idx.find(sCity[i]) == id2idx.end())
+            id2idx[sCity[i]] = idx++;
+        if (id2idx.find(eCity[i]) == id2idx.end())
+            id2idx[eCity[i]] = idx++;
+    }
+    Num = id2idx.size();
+
+    fwdList.resize(Num);
+    revList.resize(Num);
+
+    for (int i = 0; i < Num; i++)
+    {
+        fwdList[i].clear();
+        revList[i].clear();
+    }
+
+    for (int i = 0; i < N; i++)
+    {
+        fwdList[id2idx[sCity[i]]].emplace_back(id2idx[eCity[i]], mCost[i]);
+        revList[id2idx[eCity[i]]].emplace_back(id2idx[sCity[i]], mCost[i]);
+    }
+
+    return Num;
 }
 
 void add(int sCity, int eCity, int mCost)
 {
-    return;
+    fwdList[id2idx[sCity]].emplace_back(id2idx[eCity], mCost);
+    revList[id2idx[eCity]].emplace_back(id2idx[sCity], mCost);
 }
 
 int cost(int mHub)
 {
-    return 0;
+    vector<int> distance = dijkstra(fwdList, mHub);
+    vector<int> revdistance = dijkstra(revList, mHub);
+    "" int sum = 0;
+    for (int i = 0; i < Num; i++)
+    {
+        sum += distance[i];
+        sum += revdistance[i];
+    }
+
+    return sum;
 }
