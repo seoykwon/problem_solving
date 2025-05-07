@@ -20,7 +20,9 @@ struct E
 };
 
 unordered_map<int, int> id2idx;
+
 vector<vector<E>> fwdList, revList;
+
 int Num;
 
 vector<int> dijkstra(const vector<vector<E>> &fwdList, int mHub)
@@ -52,7 +54,6 @@ vector<int> dijkstra(const vector<vector<E>> &fwdList, int mHub)
             }
         }
     }
-
     return distance;
 }
 
@@ -98,7 +99,8 @@ int cost(int mHub)
 {
     vector<int> distance = dijkstra(fwdList, mHub);
     vector<int> revdistance = dijkstra(revList, mHub);
-    "" int sum = 0;
+
+    int sum = 0;
     for (int i = 0; i < Num; i++)
     {
         sum += distance[i];
