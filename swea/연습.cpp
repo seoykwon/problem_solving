@@ -1,111 +1,103 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <unordered_map>
-#include <algorithm>
-#include <climits>
-
+#include <bits/stdc++.h>
 using namespace std;
 
-struct E
+deque<char> grid[303];
+int counting[303][26];
+int h, w, len;
+int cur_r, cur_c;
+
+void init(int H, int W, char str[])
 {
-    int end, weight;
+    len = 0;
+    h = H, w = W;
 
-    E(int end, int weight) : end(end), weight(weight) {}
+    memset(counting, 0, sizeof(counting));
 
-    bool operator<(const E &other) const
+    for (int i = 0; i < 303; ++i)
+        grid[i].clear();
+
+    for (int i = 0; i < H; ++i)
     {
-        return weight > other.weight;
-    }
-};
-
-unordered_map<int, int> id2idx;
-
-vector<vector<E>> fwdList, revList;
-
-int Num;
-
-vector<int> dijkstra(const vector<vector<E>> &fwdList, int mHub)
-{
-    int X = id2idx[mHub];
-    vector<bool> visit(Num, false);
-    vector<int> distance(Num, INT_MAX);
-
-    priority_queue<E> pq;
-    pq.emplace(X, 0);
-    distance[X] = 0;
-
-    while (!pq.empty())
-    {
-        E curNode = pq.top();
-        pq.pop();
-        int cur = curNode.end;
-
-        if (visit[cur])
-            continue;
-        visit[cur] = true;
-
-        for (const E &n : fwdList[cur])
+        for (int j = 0; j < W; ++j)
         {
-            if (distance[n.end] > distance[cur] + n.weight)
+            if (str[len])
             {
-                distance[n.end] = distance[cur] + n.weight;
-                pq.emplace(n.end, distance[n.end]);
+                counting[i][str[len] - 'a']++;
+                grid[i].push_back(str[len++]);
             }
+            else
+                break;
         }
     }
-    return distance;
+
+    cur_r = cur_c = 0;
 }
 
-int init(int N, int sCity[], int eCity[], int mCost[])
+void insert(char c)
 {
-    id2idx.clear();
-    int idx = 0;
+    grid[cur_r].insert(grid[cur_r].begin() + cur_c, c);
+    counting[cur_r][c - 'a']++;
 
-    for (int i = 0; i < N; i++)
+    int row = cur_r;
+    ++cur_c;
+    ++len;
+
+    if (cur_c == w)
     {
-        if (id2idx.find(sCity[i]) == id2idx.end())
-            id2idx[sCity[i]] = idx++;
-        if (id2idx.find(eCity[i]) == id2idx.end())
-            id2idx[eCity[i]] = idx++;
-    }
-    Num = id2idx.size();
-
-    fwdList.resize(Num);
-    revList.resize(Num);
-
-    for (int i = 0; i < Num; i++)
-    {
-        fwdList[i].clear();
-        revList[i].clear();
+        ++cur_r;
+        cur_c = 0;
     }
 
-    for (int i = 0; i < N; i++)
+    while ((int)grid[row].size() > w)
     {
-        fwdList[id2idx[sCity[i]]].emplace_back(id2idx[eCity[i]], mCost[i]);
-        revList[id2idx[eCity[i]]].emplace_back(id2idx[sCity[i]], mCost[i]);
-    }
+        char bk = grid[row].back();
 
-    return Num;
+        counting[row][bk - 'a']--;
+        grid[row].pop_back();
+
+        counting[row + 1][bk - 'a']++;
+        grid[row + 1].push_front(bk);
+
+        ++row;
+    }
 }
 
-void add(int sCity, int eCity, int mCost)
+char moveCursor(int row, int col)
 {
-    fwdList[id2idx[sCity]].emplace_back(id2idx[eCity], mCost);
-    revList[id2idx[eCity]].emplace_back(id2idx[sCity], mCost);
-}
+    --row, --col;
 
-int cost(int mHub)
-{
-    vector<int> distance = dijkstra(fwdList, mHub);
-    vector<int> revdistance = dijkstra(revList, mHub);
-
-    int sum = 0;
-    for (int i = 0; i < Num; i++)
+    if (row * w + col >= len)
     {
-        sum += distance[i];
-        sum += revdistance[i];
+        row = len / w;
+        col = len % w;
+        cur_r = row;
+        cur_c = col;
+        return '$';
     }
 
-    return sum;
+    cur_r = row;
+    cur_c = col;
+
+    return grid[row][col];
+}
+
+int countCharacter(char c)
+{
+    int row = cur_r, col = cur_c;
+    int ret = 0;
+
+    if (col)
+    {
+        for (int i = col; i < (int)grid[row].size(); ++i)
+        {
+            ret += grid[row][i] == c;
+        }
+        ++row;
+    }
+
+    for (int i = row; i < h; ++i)
+    {
+        ret += counting[i][c - 'a'];
+    }
+    return ret;
 }
