@@ -23,7 +23,7 @@ SELECT ID
 FROM TBL
 WHERE GENERATION = 3
 ORDER BY ID ASC;
-
+  
 -- ###############################
 SELECT
     c.ID
