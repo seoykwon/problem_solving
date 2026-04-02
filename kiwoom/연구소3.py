@@ -4,6 +4,7 @@ from collections import deque
 
 input = sys.stdin.readline
 
+
 def solve():
     N, M = map(int, input().split())
     grid = []
@@ -24,7 +25,7 @@ def solve():
         return
 
     def bfs(selected):
-        visited = [[-1]*N for _ in range(N)]
+        visited = [[-1] * N for _ in range(N)]
         q = deque()
         for idx in selected:
             r, c = viruses[idx]
@@ -36,14 +37,14 @@ def solve():
 
         while q:
             r, c, t = q.popleft()
-            for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)]:
-                nr, nc = r+dr, c+dc
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nr, nc = r + dr, c + dc
                 if 0 <= nr < N and 0 <= nc < N and visited[nr][nc] == -1 and grid[nr][nc] != 1:
                     visited[nr][nc] = t + 1
-                    q.append((nr, nc, t+1))
+                    q.append((nr, nc, t + 1))
                     if grid[nr][nc] == 0:
                         filled += 1
-                        max_time = max(max_time, t+1)
+                        max_time = max(max_time, t + 1)
 
         if filled == empty_count:
             return max_time
@@ -54,5 +55,6 @@ def solve():
         ans = min(ans, bfs(combo))
 
     print(-1 if ans == float('inf') else ans)
+
 
 solve()
