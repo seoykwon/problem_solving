@@ -19,7 +19,7 @@ def solution():
     tr = sr                                         # 토네이도 위치 인덱스 -> 시작 지점 부터 시작
     tc = sc
     curl = 0                                        # 현재 토네이도 방향
-    turn = 2                                        # 토네이도 방향 바꾸는 지표 -> 좌-하 : turn = 2 /우-상: turn = 4, 2씩 늘어난다.
+    turn = 2                                        # 토네이도 방향 바꾸는 지표 -> 좌-하 : turn = 2 /우-상: turn = 4, 2씩 늘어난다. 이 사이클에서 총 몇 칸 가야 하는가
     now = 0                                         # 토네이도 직선 길이
     proportion = proportions[0]                     # 토네이도 방향에 따른 비율 배열
 
@@ -29,7 +29,7 @@ def solution():
         # 3-2-1. 토네이도 이동
         tr += delta[curl][0]                        # 현재 토네이도 위치
         tc += delta[curl][1]
-        now += 1                                    # 토네이도 길이 갱신
+        now += 1                                    # 토네이도 길이 갱신, 현재 방향으로 몇 칸 왔는가
         sand = data[tr][tc]
         data[tr][tc] = 0                            # 토네이도 위치에 있는 모래는 모두 proportion에 따라 이동한다.
         left = sand                                 # proportion으로 이동하고 남은 모래
