@@ -15,6 +15,9 @@ def move_turtle(N, M, turtle, board, turtle_set, result):
         # 만약 이미 탈출한 바다거북이면
         if turtle[m][0] == -1:
             continue
+        # 만약 화석이 된 거북이면
+        if turtle[m][0] == -2:
+            continue
 
         cur_turtle_r = turtle[m][0]
         cur_turtle_c = turtle[m][1]
