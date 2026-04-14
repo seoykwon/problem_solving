@@ -8,7 +8,7 @@ from collections import deque
 dx = [1, 0, -1, 0]
 dy = [0, 1, 0, -1]
 
-def move_turtle(N, M, turtle, board, turtle_set, result):
+def move_turtle(N, M, turtle, board, turtle_set, result, time):
     # 아이디가 작은 순서대로 모든 바다거북이 최단경로 탐색
     # 앞선 거북이의 이동 결과 즉시 다음 거북이 경로 탐색에 반영
     for m in range(M):
@@ -81,7 +81,9 @@ def solve():
 
     result = [0] * M
 
-    # 1단계 바다거북 이동
-    move_turtle(N, M, turtle, board, turtle_set, result)
+    for time in range(0, 101):
+
+        # 1단계 바다거북 이동
+        move_turtle(N, M, turtle, board, turtle_set, result, time)
 
 solve()
