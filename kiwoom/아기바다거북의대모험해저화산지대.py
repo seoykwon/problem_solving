@@ -59,6 +59,9 @@ def move_turtle(N, M, turtle, board, turtle_set, result, time):
                 if turtle_set.union((nr, nc)):
                     continue
 
+                visited[nr][nc] = True
+                queue.append((nr, nc))
+
 
 def solve():
     N, M, K = map(int, input())
