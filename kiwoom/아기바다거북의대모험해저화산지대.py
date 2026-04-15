@@ -34,7 +34,7 @@ def move_turtle(N, M, turtle, board, turtle_set, result, time):
             if cr == cur_turtle_r and cc == cur_turtle_c:
                 # 최단경로 존재
                 turtle_set.discard((cur_turtle_r, cur_turtle_c))
-                nd = (d + 2) % 4
+                nd = (dist + 2) % 4
                 r = cur_turtle_r + dy[nd]
                 c = cur_turtle_c + dx[nd]
                 turtle[m][0] = r
@@ -57,17 +57,17 @@ def move_turtle(N, M, turtle, board, turtle_set, result, time):
                 if board[nr][nc] == 1:
                     continue
                 # 다른 바다거북 존재시 못 감
-                if turtle_set.union((nr, nc)):
+                if (nr, nc) in turtle_set:
                     continue
 
                 visited[nr][nc] = True
-                queue.append((nr, nc))
+                queue.append((nr, nc, d))
 
 def vol_pressure(volcano_cur):
     for key in volcano_cur:
         volcano_cur[key] += 10
 
-def erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_set):
+def erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_dict):
     earth = [[0]*N for _ in range(N)]
     erupted = set()
     # 1. 열기 전파
@@ -121,9 +121,9 @@ def erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_set):
                     earth[nr][nc] += prev_heat
 
     # 3. 바다거북의 위기 (화석화)
-    for (r, c) in turtle_set:
+    for (r, c), m in enumerate(turtle_dict):
         if earth[r][c] >= 20:
-            m = turtle_dict.get((r, c))
+            # m = turtle_dict.get((r, c))
             turtle[m][0] = -2
 
     return erupted
@@ -168,7 +168,7 @@ def solve():
         vol_pressure(volcano_cur)
 
         # 3단계 화산 분출 및 연쇄 반응
-        erupted = erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_set)
+        erupted = erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_dict)
 
         # 4단계 환경 초기화
         reset(erupted, volcano_cur)
