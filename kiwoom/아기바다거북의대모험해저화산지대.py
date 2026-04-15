@@ -3,6 +3,7 @@ sys.stdin = open('input.txt', 'r')
 input = sys.stdin.readline
 
 from collections import deque
+import math
 
 # 우 하 좌 상
 dx = [1, 0, -1, 0]
@@ -62,6 +63,76 @@ def move_turtle(N, M, turtle, board, turtle_set, result, time):
                 visited[nr][nc] = True
                 queue.append((nr, nc))
 
+def vol_pressure(volcano_cur):
+    for key in volcano_cur:
+        volcano_cur[key] += 10
+
+def erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_set):
+    earth = [[0]*N for _ in range(N)]
+    erupted = set()
+    # 1. 열기 전파
+    for key in volcano_cur:
+        if volcano_cur[key] >= volcano_max[key]:
+            erupted.add(key)
+            heat = volcano_cur[key] - volcano_max[key]
+            # 열기는 상하좌우 4방향으로 뻗어 나감
+            r, c = map(int, key)
+            earth[r][c] += heat
+
+            for d in range(4):
+                prev_heat = heat
+                for dist in range(1, N):
+                    nr = r + (dy[d] * dist)
+                    nc = c + (dx[d] * dist)
+
+                    if nr < 0 or nc < 0 or nr >= N or nc >= N:
+                        break
+                    if board[nr][nc] == 1:
+                        break
+
+                    prev_heat = prev_heat // 2
+                    if prev_heat <= 0:
+                        break
+
+                    earth[nr][nc] += prev_heat
+
+    # 2. 연쇄 반응
+    for (r, c), v in volcano_cur.items():
+        if volcano_cur[(r, c)] + earth[r][c] >= volcano_max[(r, c)]:
+            erupted.add((r, c))
+            heat = volcano_cur[(r, c)] + earth[r][c] - volcano_max[(r, c)]
+            earth[r][c] += heat
+
+            for d in range(4):
+                prev_heat = heat
+                for dist in range(1, N):
+                    nr = r + (dy[d] * dist)
+                    nc = c + (dx[d] * dist)
+
+                    if nr < 0 or nc < 0 or nr >= N or nc >= N:
+                        break
+                    if board[nr][nc] == 1:
+                        break
+
+                    prev_heat = prev_heat // 2
+                    if prev_heat <= 0:
+                        break
+
+                    earth[nr][nc] += prev_heat
+
+    # 3. 바다거북의 위기 (화석화)
+    for (r, c) in turtle_set:
+        if earth[r][c] >= 20:
+            m = turtle_dict.get((r, c))
+            turtle[m][0] = -2
+
+    return erupted
+
+def reset(erupted, volcano_cur):
+    # 바다 위의 모든 열기 정보 사라짐 (earth는 지역 변수로 초기화됨)
+    # 이번에 분출 일으킨 화산 모두 0으로 초기화
+    for key in erupted:
+        volcano_cur[key] = 0
 
 def solve():
     N, M, K = map(int, input())
@@ -72,15 +143,19 @@ def solve():
 
     turtle = []
     turtle_set = set()
+    turtle_dict = {}
     for m in range(M):
         r, c = map(int, input().split())
         turtle.append([r, c])
-        turtle_set.add([r, c])
+        turtle_set.add((r, c))
+        turtle_dict[(r, c)] = m
 
-    vocalno = []
+    volcano_cur = {}
+    volcano_max = {}
     for k in range(K):
-        r, c = map(int, input().split())
-        vocalno.append((r, c))
+        r, c, p = map(int, input().split())
+        volcano_cur[(r, c)] = 0
+        volcano_max[(r, c)] = p
 
     result = [0] * M
 
@@ -88,5 +163,14 @@ def solve():
 
         # 1단계 바다거북 이동
         move_turtle(N, M, turtle, board, turtle_set, result, time)
+
+        # 2단계 화산 압력 증가
+        vol_pressure(volcano_cur)
+
+        # 3단계 화산 분출 및 연쇄 반응
+        erupted = erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_set)
+
+        # 4단계 환경 초기화
+        reset(erupted, volcano_cur)
 
 solve()
