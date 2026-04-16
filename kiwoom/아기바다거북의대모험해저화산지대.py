@@ -53,50 +53,101 @@ def move_turtle(N, M, turtle, board, turtle_set, result, time, turtle_dict):
         cur_turtle_r = turtle[m][0]
         cur_turtle_c = turtle[m][1]
 
+        # queue = deque()
+        # visited = [[False]*N for _ in range(N)]
+        # queue.append((N-1, N-1, 0))
+        #
+        # while queue:
+        #     cr, cc, dist = queue.popleft()
+        #     visited[cr][cc] = True
+        #
+        #     if cr == cur_turtle_r and cc == cur_turtle_c:
+        #         # 최단경로 존재
+        #         turtle_set.discard((cur_turtle_r, cur_turtle_c))
+        #         turtle_dict.pop((cur_turtle_r, cur_turtle_c))
+        #         nd = (dist + 2) % 4
+        #         r = cur_turtle_r + dy[nd]
+        #         c = cur_turtle_c + dx[nd]
+        #         turtle[m][0] = r
+        #         turtle[m][1] = c
+        #         # 거북이 위치 갱신
+        #
+        #         # 도착했을 시
+        #         if r == N - 1 and c == N - 1:
+        #             result[m] = time + 1
+        #             turtle[m][0] = -1
+        #             break
+        #
+        #         turtle_set.add((turtle[m][0], turtle[m][1]))
+        #         turtle_dict[(r, c)] = m
+        #         break
+        #
+        #     for d in range(3, -1, -1):
+        #         nr = cr + dy[d]
+        #         nc = cc + dx[d]
+        #
+        #         if nr < 0 or nc < 0 or nr >= N or nc >= N or visited[nr][nc]:
+        #             continue
+        #         if board[nr][nc] == 1:
+        #             continue
+        #         # 다른 바다거북 존재시 못 감
+        #         # 자기 위치에는 갈 수 있어야 함
+        #         if (nr, nc) in turtle_set and (nr, nc) != (cur_turtle_r, cur_turtle_c):
+        #             continue
+        #
+        #         visited[nr][nc] = True
+        #         queue.append((nr, nc, d))
+        # 순방향 BFS로 교체
         queue = deque()
-        visited = [[False]*N for _ in range(N)]
-        queue.append((N-1, N-1, 0))
+        visited = [[False] * N for _ in range(N)]
+        visited[cur_turtle_r][cur_turtle_c] = True
+        found = False
+
+        # 첫 이동 우선순위(우,하,좌,상) 순서로 초기 큐 세팅
+        for d in range(4):
+            nr = cur_turtle_r + dy[d]
+            nc = cur_turtle_c + dx[d]
+            if nr < 0 or nc < 0 or nr >= N or nc >= N:
+                continue
+            if board[nr][nc] == 1:
+                continue
+            if (nr, nc) in turtle_set:
+                continue
+            if not visited[nr][nc]:
+                visited[nr][nc] = True
+                queue.append((nr, nc, d))  # d = 거북이의 첫 이동 방향
 
         while queue:
-            cr, cc, dist = queue.popleft()
-            visited[cr][cc] = True
+            cr, cc, first_d = queue.popleft()
 
-            if cr == cur_turtle_r and cc == cur_turtle_c:
-                # 최단경로 존재
+            if cr == N - 1 and cc == N - 1:
+                # 도착! first_d 방향으로 한 칸 이동
                 turtle_set.discard((cur_turtle_r, cur_turtle_c))
                 turtle_dict.pop((cur_turtle_r, cur_turtle_c))
-                nd = (dist + 2) % 4
-                r = cur_turtle_r + dy[nd]
-                c = cur_turtle_c + dx[nd]
+                r = cur_turtle_r + dy[first_d]
+                c = cur_turtle_c + dx[first_d]
                 turtle[m][0] = r
                 turtle[m][1] = c
-                # 거북이 위치 갱신
-
-                # 도착했을 시
                 if r == N - 1 and c == N - 1:
                     result[m] = time + 1
                     turtle[m][0] = -1
                     break
-
-                turtle_set.add((turtle[m][0], turtle[m][1]))
+                turtle_set.add((r, c))
                 turtle_dict[(r, c)] = m
+                found = True
                 break
 
-            for d in range(3, -1, -1):
+            for d in range(4):
                 nr = cr + dy[d]
                 nc = cc + dx[d]
-
                 if nr < 0 or nc < 0 or nr >= N or nc >= N or visited[nr][nc]:
                     continue
                 if board[nr][nc] == 1:
                     continue
-                # 다른 바다거북 존재시 못 감
-                # 자기 위치에는 갈 수 있어야 함
-                if (nr, nc) in turtle_set and (nr, nc) != (cur_turtle_r, cur_turtle_c):
+                if (nr, nc) in turtle_set:
                     continue
-
                 visited[nr][nc] = True
-                queue.append((nr, nc, d))
+                queue.append((nr, nc, first_d))  # 첫 방향 그대로 유지
 
 def vol_pressure(volcano_cur):
     for key in volcano_cur:
@@ -175,6 +226,8 @@ def erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_dict):
         if volcano_cur[(er, ec)] + earth[er][ec] - volcano_max[(er, ec)] < 0:
             continue
 
+        earth[er][ec] += heat
+
         for d in range(4):
             prev_heat = heat
             for dist in range(1, N):
@@ -234,7 +287,7 @@ def solve():
 
     result = [-1] * M
 
-    for time in range(0, 101):
+    for time in range(0, 100):
 
         # 1단계 바다거북 이동
         move_turtle(N, M, turtle, board, turtle_set, result, time, turtle_dict)
