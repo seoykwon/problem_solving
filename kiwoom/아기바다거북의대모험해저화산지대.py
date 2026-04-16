@@ -1,5 +1,5 @@
 import sys
-sys.stdin = open('input.txt', 'r')
+# sys.stdin = open('input.txt', 'r')
 input = sys.stdin.readline
 
 '''
@@ -74,7 +74,7 @@ def move_turtle(N, M, turtle, board, turtle_set, result, time, turtle_dict):
 
                 # 도착했을 시
                 if r == N - 1 and c == N - 1:
-                    result[m] = time
+                    result[m] = time + 1
                     turtle[m][0] = -1
                     break
 
@@ -109,7 +109,7 @@ def erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_dict):
     for key in volcano_cur:
         if volcano_cur[key] >= volcano_max[key]:
             erupted.add(key)
-            heat = volcano_cur[key] - volcano_max[key]
+            heat = volcano_max[key]
             # 열기는 상하좌우 4방향으로 뻗어 나감
             r, c = map(int, key)
             earth[r][c] += heat
@@ -171,8 +171,8 @@ def erupt_vol(volcano_cur, volcano_max, N, board, turtle, turtle_dict):
 
     while chain_queue:
         er, ec = chain_queue.popleft()
-        heat = volcano_cur[(er, ec)] + earth[er][ec] - volcano_max[(er, ec)]
-        if heat < 0:
+        heat = volcano_max[(er, ec)]
+        if volcano_cur[(er, ec)] + earth[er][ec] - volcano_max[(er, ec)] < 0:
             continue
 
         for d in range(4):
@@ -252,3 +252,30 @@ def solve():
         print(result[i])
 
 solve()
+
+'''
+버그 1: turtle_dict 갱신 누락
+거북이가 이동할 때 turtle_set만 갱신하고 turtle_dict는 갱신하지 않아 화석화 판정이 항상 틀린 위치를 참조했습니다.
+
+버그 2: 연쇄 반응에서 1단계 화산 중복 처리
+1단계에서 이미 분출한 화산을 연쇄 반응에서 또 처리해 열기가 2배로 전파됐습니다.
+
+버그 3: result 초기값 오류
+result = [0] * M으로 초기화하면 time=0에 탈출한 거북이를 마지막에 -1로 바꿔버립니다. result = [-1] * M으로 초기화해야 합니다.
+
+버그 4: 연쇄 반응을 딕셔너리 순회로 처리
+딕셔너리 순회는 이미 지나친 화산에 새 열기를 반영할 수 없어 연쇄 폭발이 누락됩니다. BFS로 처리해야 합니다.
+
+버그 5: dx/dy 오타
+열기 전파에서 행(row) 계산에 dy 대신 dx를 써서 방향이 완전히 틀렸습니다.
+nr = er + dx[d] * dist  # ❌
+nr = er + dy[d] * dist  # ✅
+
+버그 6: BFS가 거북이 자신의 위치를 막음
+turtle_set 충돌 체크에서 현재 거북이 자신의 위치도 막혀 BFS가 목적지에 절대 도달하지 못했습니다.
+if (nr, nc) in turtle_set and (nr, nc) != (cur_turtle_r, cur_turtle_c):
+
+버그 7: 분출 열기량 오류
+화산은 초과분(cur - max)이 아니라 임계치 P만큼 열기를 방출해야 합니다.
+heat = volcano_max[key]  # ✅
+'''
