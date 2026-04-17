@@ -4,7 +4,7 @@ input = sys.stdin.readline
 
 N = int(input())
 
-dp = [0] * (N + 1)
+dp = [0] * max(N + 1, 3)
 dp[1] = 1
 dp[2] = 3
 
