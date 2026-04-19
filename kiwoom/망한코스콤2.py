@@ -1,54 +1,41 @@
 def s(x):
     return sum(int(d) for d in str(x))
 
-def find_next_x(x):
+def find_y(x):
     sx = s(x)
-    target = x - sx  # y + s(y) = target 만족하는 y 탐색
-    
+    target = x - sx  # y + s(y) = target
     if target <= 0:
         return None
-    
-    # 이분탐색으로 y 위치 파악
-    lo, hi = 0, x
+
+    lo, hi = 1, x
     while lo < hi:
         mid = (lo + hi) // 2
         if mid + s(mid) < target:
             lo = mid + 1
         else:
             hi = mid
-    
-    # s(y) 불연속성 때문에 근방 ±200 보정
+
     candidates = []
-    for y in range(max(0, lo - 200), min(x, lo + 200)):
+    for y in range(max(1, lo - 200), min(x, lo + 200)):
         if y + s(y) == target:
             candidates.append(y)
-    
-    if not candidates:
-        return None
-    
-    # x' = s(x) + s(y) 중 최솟값
-    return min(sx + s(y) for y in candidates)
 
+    return min(candidates) if candidates else None
 
 def solve(x):
     visited = set()
     min_x = x
-    
+
     while x not in visited:
         visited.add(x)
-        
-        next_x = find_next_x(x)
-        
-        if next_x is None:
+        y = find_y(x)
+        if y is None:
             break
-        
-        min_x = min(min_x, next_x)
-        x = next_x
-    
+        x = abs(x - y)  # ✅ s(x) + s(y) 와 동일
+        min_x = min(min_x, x)
+
     return min_x
 
-
-# 테스트
-print(solve(199))       # 19
-print(solve(10000000))  # 작은 수로 수렴
-print(solve(100))       # 결과 확인
+print(solve(75))        # 75→21→12
+print(solve(7))         # 7
+print(solve(29999999))  # 빠르게 수렴
