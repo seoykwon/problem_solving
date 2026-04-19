@@ -3,160 +3,116 @@ sys.stdin = open('input.txt', 'r')
 input = sys.stdin.readline
 
 '''
-1단계: 인접 탐험 
-    (상하좌우 인접 칸 중 방문하지 않은 바다 칸이 있다면)
-    1. 현재 바라보는 방향으로 직진
-    2. 좌회전 (90도 반시계 방향 회전) 후 직진
-    3. 우회전 (90도 시계 방향 회전) 후 직진
-    4. 180도 회전 후 직진
-2단계: 가장 가까운 바다로 이동
-    인접한 칸 모두에 방문 가능한 바다가 없다면, 아직 방문하지 않은 바다 칸 중 가장 가까운 칸
-    ?? 가장 가까운 칸을 어떻게 찾지?
-    1. 거리는 상하좌우로 인접한 칸을 한 칸씩 이동하여 도달하는 데 필요한 최소 이동 횟수
-        암초는 지나갈 수 없지만, 이미 방문한 바다는 지나갈 수 있음
-        N <= 50이어서 완전 탐색 돌려도 되는 건가? 그리고 거리 계산식
-    2. 가장 가까운 칸이 여러 개라면 행 번호가 가장 작은 칸 선택, 행 번호 같으면 열 번호가 가장 작은 칸
-    3. 선택한 칸까지 최단 거리 이동 (BFS?) 매 이동마다 선택한 칸까지의 거리가 1줄어드는 인접한 칸 중 하나로 이동
-        그러한 칸이 여러 개면 좌, 하, 우, 상 우선순위
-    4. 도착 후 바라보는 방향 마지막 이동 방향으로 갱신
-
-N*N 보드에서 각 칸과의 거리는 보통 맨해튼 거리로 계산
-d = |x1 - x2| + |y1 - y2|
+1단계를 BFS로 구현한 것이 가장 큰 문제
+우선순위가 전혀 작동하지 않음
+치명적인 타입에러 
+2단계 거리는 맨해튼 거리가 아니라 BFS
+2단계 경로 추적의 좌하우상 우선순위 무시
+얕은 복사버그. copy.deepcopy(visited)
+입력 처리에서 읽는 줄 개수 오류
+solve에서 r, c가 절대 업데이트 안 됨
 '''
 
 from collections import deque
 
-# 1 = 상, 2 = 하, 3 = 좌, 4 = 우
-# dx = [0, 0, 0, -1, 1]
-# dy = [0, -1, 1, 0, 0]
+dir_map = {1: 0, 2: 1, 3: 2, 4: 3}
+dr = [-1, 1, 0, 0]
+dc = [0, 0, -1, 1]
 
-dir_dict = {1: 3, 2: 1, 3: 0, 4: 2}
+turns = {
+    0: [0, 2, 3, 1], # 상: 상->좌->우->하
+    1: [1, 3, 2, 0], # 하: 하->우->좌->상
+    2: [2, 1, 0, 3], # 좌: 좌->하->상->우
+    3: [3, 0, 1, 2], # 우: 우->상->하->좌
+}
 
-# 좌 하 우 상
-dir = [[0, -1], [1, 0], [0, 1], [-1, 0]]
-
-def neighbors(visited):
-    
-    queue = deque()
-    direction = dir_dict[d]
-    queue.append((r, c, direction))
-    rr, rc, rdist = 0, 0, d
-
-    while queue:
-        cr, cc, dist = queue.popleft()
-        visited[cr][cc] = True
-        rr, rc, rdist = cr, cc, dist
-        print(cr, " ", cc)
-
-        # 1. 현재 방향
-        nr = cr + dir[dist]
-        nc = cc + dir[dist]
-
-        if nr < 0 or nc < 0 or nr >= N or nc >= N or visited[nr][nc] or board[nr][nc]:
-            continue
-        visited[nr][nc] = True
-        queue.append((nr, nc, dist))
-
-        # 2. 좌회전
-        dist = (dist + 1) % 4
-        nr = cr + dir[dist]
-        nc = cc + dir[dist]
-
-        if nr < 0 or nc < 0 or nr >= N or nc >= N or visited[nr][nc] or board[nr][nc]:
-            continue
-        visited[nr][nc] = True
-        queue.append((nr, nc, dist))
-
-        # 3. 우회전
-        dist = (dist + 2) % 4
-        nr = cr + dir[dist]
-        nc = cc + dir[dist]
-
-        if nr < 0 or nc < 0 or nr >= N or nc >= N or visited[nr][nc] or board[nr][nc]:
-            continue
-        visited[nr][nc] = True
-        queue.append((nr, nc, dist))
-
-        # 4. 반대 방향
-        dist = (dist - 1) % 4
-        nr = cr + dir[dist]
-        nc = cc + dir[dist]
-
-        if nr < 0 or nc < 0 or nr >= N or nc >= N or visited[nr][nc] or board[nr][nc]:
-            continue
-        visited[nr][nc] = True
-        queue.append((nr, nc, dist))
-
-    return (rr, rc, rdist)
-    
-
-def moving(r, c, d, visited):
-    # 아직 방문하지 않은 바다 칸 중 현재 위치에서 가장 가까운 칸
+def bfs(sr, sc, board, N):
+    """(sr, sc)에서 모든 바다 칸까지의 최단 거리. 암초는 통과 불가."""
     INF = float('inf')
-    manhattan = [[INF]*N for _ in range(N)]
-    nr, nc, nd = INF, INF, INF
-    dist = INF
+    dist = [[INF]*N for _ in range(N)]
+    dist[sr][sc] = 0
+    q = deque([(sr, sc)])
 
-    for i in range(N):
-        for j in range(N):
-            if not visited[i][j] and board[i][j] != 1:
-                tmp_dist = abs(i - r) + abs(j - c)
-                manhattan[i][j] = tmp_dist
-                if tmp_dist < dist:
-                    dist = tmp_dist
-                    nr = i
-                    nc = j
-                    nd = tmp_dist
-
-    # 선택한 칸까지 최단 거리로 이동
-    # 선택한 칸까지의 거리가 1 줄어드는 인접한 칸 이동
-    queue = deque()
-    queue.append((r, c, dist))
-    visited2 = visited[:]
-
-    while queue:
-        cr, cc, cd = queue.popleft()
-        visited2[cr][cc] = True
-        if cr == nr and cc == nc:
-            return (cr, cc)
-
-        print(cr, " ", cc)
-
-        for direction in range(4):
-            nnr = cr + dir[direction][0]
-            nnc = cc + dir[direction][1]
-
-            if nnr < 0 or nnc < 0 or nnr >= N or nnc >= N or visited2[nnr][nnc]:
-                continue
-            
-            tmp_dist = abs(cr - nnr) + abs(cc - nnc)
-            if tmp_dist < cd:
-                visited2[nnr][nnc] = True
-                queue.append((nnr, nnc, tmp_dist))
-
-
+    while q:
+        cr, cc = q.popleft()
+        for i in range(4):
+            nr, nc = cr + dr[i], cc + dc[i]
+            if 0 <= nr < N and 0 <= nc < N and board[nr][nc] == 0 and dist[nr][nc] == INF:
+                dist[nr][nc] = dist[cr][cc] + 1
+                q.append((nr, nc))
+    return dist
 
 def solve():
+    N, r, c, d = map(int, input().split())
+    board = [list(map(int, input().split())) for _ in range(N)]
+
+    r -= 1
+    c -= 1
+    d = dir_map[d]
+
     visited = [[False]*N for _ in range(N)]
-    while True:
-        r, c, d = neighbors(visited)
+    visited[r][c] = True
+    result = [(r+1, c+1)] # 출력은 1-indexed
 
-        r, c = moving(r, c, d)
+    total_sea = sum(row.count(0) for row in board)
 
-        flag = True
-        for i in range(N):
-            for j in range(N):
-                if not visited[i][j] and board[i][j] != 1:
-                    flag = False
-        if flag:
+    while len(result) < total_sea:
+        # 1단계: 인접 탐험
+        while True:
+            moved = False
+            for nd in turns[d]:
+                nr, nc = r + dr[nd], c + dc[nd]
+                if 0 <= nr < N and 0 <= nc < N and board[nr][nc] == 0 and not visited[nr][nc]:
+                    r, c, d = nr, nc, nd
+                    visited[r][c] = True
+                    result.append((r+1, c+1))
+                    moved = True
+                    break # 우선순위상 첫 번째 성공에서 멈춤
+            if not moved: # 인접한 칸에 움직일 수 있는 칸이 없을 때
+                break
+            
+        if len(result) >= total_sea:
             break
 
+        # 2단계: 가장 가까운 미방문 바다 선택
+        dist_cur = bfs(r, c, board, N)
+        target = None
+        best = float('inf')
+        for i in range(N):
+            for j in range(N):
+                if not visited[i][j] and board[i][j] == 0 and dist_cur[i][j] < best:
+                    best = dist_cur[i][j]
+                    target = (i, j)
+        if target is None:
+            break
+        
+        # 2단계: 좌->하->우->상 우선순위로 최단 경로 이동
+        dist_tgt = bfs(target[0], target[1], board, N)
+        priority = [2, 1, 3, 0]
+        while (r, c) != target:
+            cur = dist_tgt[r][c]
+            for i in priority:
+                nr, nc = r + dr[i], c + dc[i]
+                if 0 <= nr < N and 0 <= nc < N and board[nr][nc] == 0 and dist_tgt[nr][nc] == cur - 1:
+                    r, c, d = nr, nc, i
+                    break
 
-N, r, c, d = map(int, input().split())
+        visited[r][c] = True
+        result.append((r+1, c+1))
 
-board = []
-
-for _ in range(N):
-    board.append(list(map(int, input())))
+    print('\n'.join(f'{x} {y}' for x, y in result))
 
 solve()
+
+'''
+문제 이해보다 구현의 정확성에서 주로 막히고 있다.
+
+1. 비슷한 알고리즘으로 대체하는 습관이 있다
+2. 경계/인덱싱에서 계속 실수한다
+    이 변수가 지금 어떤 타입/범위인가를 머릿속에서 놓치고 있다
+3. 디버깅 없이 다 됐다고 판단한다. 
+    코드 짜고 반드시 예제 입력으로 손이든 실행이든 한 번 트레이스하기
+
+"문제를 못 읽는다"는 아니다. 머릿속 계획을 코드로 옮기는 중간 단계에서 디테일이 샌다.
+알고리즘 지식 새로 쌓을 필요 없고, 짤 때 변수 타입, 인덱스 기준 문제 정의를 계속 의식하는 습관
+'''
