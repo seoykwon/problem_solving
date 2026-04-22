@@ -5,7 +5,7 @@
 def check(t, r):
     left = t
     ori_r = r
-    cur_num = dic[0][2]
+    cur_num = dic[0][2] # 첫 집 번호에서 시작
     
     while r > 0:
         # 개미 한마리 배치
@@ -61,10 +61,10 @@ for _ in range(q):
 
     elif op == 300:
         q = query[1]
-        b = dic[q][1]
-        a = dic[q][2]
-        dic[b][2] = dic[q][2]
-        dic[a][1] = dic[q][1]
+        b = dic[q][1]   # q의 prev
+        a = dic[q][2]   # q의 next
+        dic[b][2] = dic[q][2]   # prev의 next를 q의 next로
+        dic[a][1] = dic[q][1]   # next의 prev를 q의 prev로
         del dic[q]
     
     elif op == 400:
