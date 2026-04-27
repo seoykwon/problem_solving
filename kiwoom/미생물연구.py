@@ -174,12 +174,16 @@ from collections import deque
 
 def solve():
     N, Q = map(int, input().split())
+    # N: 배양 용기 크기, Q: 실험 횟수
 
     board = [[0] * N for _ in range(N)]
-    micro_cells = {}  # key -> set of (r, c)
+    # N×N 격자. 각 칸에 미생물 번호 저장 (0이면 비어있음)
 
-    # ── 연결 요소 수 반환 (2 이상이면 조기 종료) ──────────────────────────
+    micro_cells = {}
+    # 미생물 번호 → 그 미생물이 차지한 칸들의 집합 {(r,c), ...}
+
     def count_components(cells):
+        # cells 안의 칸들이 몇 개의 덩어리로 나뉘는지 반환
         if not cells:
             return 0
         visited = set()
@@ -190,6 +194,7 @@ def solve():
             count += 1
             if count > 1:
                 return count
+            # count > 1 이면 이미 분리된 거라 더 볼 필요 없음
             q = deque([start])
             visited.add(start)
             while q:
@@ -199,54 +204,63 @@ def solve():
                     if nb in cells and nb not in visited:
                         visited.add(nb)
                         q.append(nb)
+                # 상하좌우 인접한 칸이 cells 안에 있으면 같은 덩어리로 탐색
         return count
 
     results = []
 
     for q_idx in range(1, Q + 1):
         x1, y1, x2, y2 = map(int, input().split())
+        # (x1,y1): 직사각형 좌하단, (x2,y2): 우상단 (좌표 평면 기준)
 
-        # 배양 용기: 좌하단 (0,0), 우상단 (N,N)
-        # 배열: row 0 = 위쪽, col 0 = 왼쪽
-        # 직사각형 (x1,y1)-(x2,y2): col∈[x1,x2), row∈[N-y2, N-y1)
-        r_top  = N - y2
-        r_bot  = N - y1
-        c_left = x1
-        c_right = x2
+        r_top   = N - y2   # 배열 기준 위쪽 행 (포함)
+        r_bot   = N - y1   # 배열 기준 아래쪽 행 (미포함)
+        c_left  = x1       # 배열 기준 왼쪽 열 (포함)
+        c_right = x2       # 배열 기준 오른쪽 열 (미포함)
 
         new_rect = set()
         for r in range(r_top, r_bot):
             for c in range(c_left, c_right):
                 new_rect.add((r, c))
+        # 새로 투입되는 미생물이 차지할 칸들
 
-        # STEP 1 : 미생물 투입
+        # ── STEP 1 : 미생물 투입 ──────────────────────────────────────
+
         affected = set()
         for r, c in new_rect:
             if board[r][c] != 0:
                 affected.add(board[r][c])
+        # new_rect 안에 이미 있던 미생물 번호들 수집
 
         to_delete = []
         for key in affected:
             old_cells = micro_cells[key]
             remaining = old_cells - new_rect
+            # 새 미생물한테 잡아먹히고 남은 칸들
 
             if not remaining or count_components(remaining) > 1:
+                # 남은 게 없거나, 둘 이상으로 분리되면 완전 소멸
                 for r, c in remaining:
                     board[r][c] = 0
                 to_delete.append(key)
             else:
                 micro_cells[key] = remaining
+                # 연결 유지되면 생존, 잡아먹힌 칸만 제거
 
         for key in to_delete:
             del micro_cells[key]
+        # 순회 끝난 뒤에 삭제 (순회 중 삭제하면 RuntimeError)
 
         micro_cells[q_idx] = new_rect
         for r, c in new_rect:
             board[r][c] = q_idx
+        # 새 미생물 배치 (rect 안을 q_idx로 덮어씌움)
 
-        # STEP 2 : 새 배양 용기로 이동
+        # ── STEP 2 : 새 배양 용기로 이동 ─────────────────────────────
+
         order = sorted(micro_cells.keys(),
                        key=lambda k: (-len(micro_cells[k]), k))
+        # 넓은 순서 정렬, 넓이 같으면 번호 작은 것(먼저 투입된 것) 우선
 
         new_board = [[0] * N for _ in range(N)]
         new_micro_cells = {}
@@ -259,25 +273,33 @@ def solve():
             c_min, c_max = min(cols), max(cols)
             height = r_max - r_min + 1
             width  = c_max - c_min + 1
+            # 현재 미생물의 바운딩 박스 크기
 
             rel = [(r - r_min, c - c_min) for r, c in cells]
+            # 바운딩 박스 좌상단 기준 상대 좌표로 변환
+            # 이걸 해야 나중에 어디든 갖다 붙일 수 있음
 
             placed = False
             for tc in range(N - width + 1):
+                # tc: 새 위치의 왼쪽 열. x 최소 우선이라 0부터 시작
                 if placed:
                     break
                 for tr in range(N - height, -1, -1):
+                    # tr: 새 위치의 위쪽 행. y 최소(= 배열 행 최대) 우선이라 아래부터
                     if all(new_board[tr + dr][tc + dc] == 0 for dr, dc in rel):
+                        # 놓으려는 칸이 전부 비어있으면 배치
                         for dr, dc in rel:
                             new_board[tr + dr][tc + dc] = key
                         new_micro_cells[key] = {(tr + dr, tc + dc) for dr, dc in rel}
                         placed = True
                         break
+            # placed == False면 어디도 못 놓음 → 소멸 (그냥 안 넣으면 됨)
 
         board = new_board
         micro_cells = new_micro_cells
 
-        # STEP 3 : 실험 결과 기록
+        # ── STEP 3 : 실험 결과 기록 ──────────────────────────────────
+
         result = 0
         seen_pairs = set()
 
@@ -293,9 +315,12 @@ def solve():
                             if pair not in seen_pairs:
                                 seen_pairs.add(pair)
                                 result += area_key * len(micro_cells[other])
+                            # 인접한 서로 다른 무리 쌍 발견 시 넓이 곱 더함
+                            # (A,B)와 (B,A)를 같은 쌍으로 처리하려고 min/max 정규화
 
         results.append(result)
 
-    sys.stdout.write('\n'.join(map(str, results)) + '\n')
+    for r in results:
+        print(r)
 
 solve()
