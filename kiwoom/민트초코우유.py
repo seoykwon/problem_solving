@@ -151,8 +151,40 @@ def evening(gN, N, faith, food, group, group_id):
             spread(i, j, valid, N, faith, group, group_id, food)
     
 
-def print_faith():
+def print_faith(N, food, faith):
+    result = [0] * 7
 
+    for i in range(N):
+        for j in range(N):
+            # 민트초코우유: 7
+            if food[i][j] == 7:
+                result[0] += faith[i][j]
+
+            # 민트초코: 6
+            elif food[i][j] == 6:
+                result[1] += faith[i][j]
+
+            # 민트우유: 5
+            elif food[i][j] == 5:
+                result[2] += faith[i][j]
+
+            # 초코우유: 3
+            elif food[i][j] == 3:
+                result[3] += faith[i][j]
+
+            # 우유: 1
+            elif food[i][j] == 1:
+                result[4] += faith[i][j]
+
+            # 초코: 2
+            elif food[i][j] == 2:
+                result[5] += faith[i][j]
+
+            # 민트: 4
+            elif food[i][j] == 4:
+                result[6] += faith[i][j]
+
+    print(result[0], result[1], result[2], result[3], result[4], result[5], result[6])
 
 def solve():
     N, T = map(int, input().split())
@@ -183,7 +215,7 @@ def solve():
         evening(gN, N, faith, food, group, group_id, rev_group_id)
 
         # 7개 신앙심 프린트
-        print_faith()
+        print_faith(N, food, faith)
 
         T -= 1
 
