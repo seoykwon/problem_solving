@@ -315,7 +315,7 @@ def spread_foot_at_dinner(SIZE, F, B, group_info):
     group_info.sort(key=lambda x: (
         len(x['food']),
         -B[x['head'][0]][x['head'][1]],
-        x['heaad'][0],
+        x['head'][0],
         x['head'][1]
     ))
 
