@@ -173,7 +173,10 @@ def medusa_see(bd, N, warriors, mr, mc):
                     break
     
     # 방향 고르고 전사들 돌로 만들기
-    -w, d, wlst, vbd = potential[0]
+    # -w, d, wlst, vbd = potential[0]
+    neg_w, d, wlst, vbd = potential[0]
+
+    w = neg_w
 
     for r, c in wlst:
         warriors[(r, c)] = -1
@@ -325,8 +328,14 @@ def solve():
     warriors = {}
     # 사라진 전사는 딕셔너리에서 삭제함
     # 인덱스가 -1면 임시적으로 돌이 된 전사
-    for i in range(1, M + 1):
-        r, c = map(int, input().split())
+    # for i in range(1, M + 1):
+    #     r, c = map(int, input().split())
+    #     warriors[(r, c)] = i
+    wlst = list(map(int, input().split()))
+
+    for i in range(0, 2 * M, 2):
+        r = wlst[i]
+        c = wlst[i + 1]
         warriors[(r, c)] = i
 
     board = []
