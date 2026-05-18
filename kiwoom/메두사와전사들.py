@@ -1,371 +1,274 @@
 import sys
-sys.stdin = open('input.txt', 'r')
+from collections import deque
+from typing import List, Tuple
 input = sys.stdin.readline
 
-from collections import deque
-import heapq
-
-# 상하좌우
-dy = [-1, 1, 0, 0]
-dx = [0, 0, -1, 1]
-
-def bfs(bd, N, warriors, mr, mc, pr, pc):
-    q = deque()
-    visited = [[False] * N for _ in range(N)]
-
-    q.append([mr, mc, -1])
-    visited[mr][mc] = True
-
-    candidates = []
-
-    res = -1
-
-    while q:
-        cr, cc, dir = q.popleft()
-
-        if cr == pr and cc == pc:
-            res = dir
-
-        for d in range(4):
-            nr = cr + dy[d]
-            nc = cc + dx[d]
-
-            if nr < 0 or nc < 0 or nr >= N or nc >= N:
-                continue
-            if visited[nr][nc]:
-                continue
-            if bd[nr][nc] == 0:
-                continue
-
-            # 이동
-            if dir == -1:
-                q.append([nr, nc, d])
-                visited[nr][nc] = True
-                continue
-            
-            if (nr, nc) in warriors:
-                candidates.append([nr, nc])
-
-            q.append([nr, nc, dir])
-            visited[nr][nc] = True
-
-    if res != -1:
-        for r, c in candidates:
-            del warriors[(r, c)]
-        
-        return res
-    
-    return res
-        
-
-def medusa_move(bd, N, warriors, mr, mc, pr, pc):
-    # 도로를 따라 한 칸 이동
-    dir = bfs(bd, N, warriors, mr, mc, pr, pc)
-
-    if dir == -1:
-        return [-1, -1]
-
-    nr = mr + dy[dir]
-    nc = mc + dx[dir]
-
-    return [nr, nc]
-
-def medusa_see(bd, N, warriors, mr, mc):
-    # 상하좌우 중 전사를 가장 많이 볼 수 있는 방향 바라보기
-    potential = []
-
-    cr, cc = mr, mc
-
-    DIR = [[[-1, -1], [-1, 1]], [[1, -1], [1, 1]], [[-1, -1], [1, -1]], [[-1, 1], [1, 1]]]
-
-    for d in range(4):
-        w = 0
-        # row-rise
-        valid_col = [True] * N
-        left_r, left_c, right_r, right_c = cr, cc, cr, cc
-
-        valid_row = [True] * N
-        top_r, top_c, bottom_r, bottom_c = cr, cc, cr, cc
-
-        warrior_list = []
-        vision = [[False] * N for _ in range(N)]
-
-        if d in [0, 1]:
-            while True:
-                if 0 <= left_r + DIR[d][0][0] < N and valid_col[left_c + DIR[d][0][1]]:
-                    left_r = left_r + DIR[d][0][0]
-
-                if 0 <= left_c + DIR[d][0][1] < N and valid_col[left_c + DIR[d][0][1]]:
-                    left_c = left_c + DIR[d][0][1]
-
-                if 0 <= right_r + DIR[d][1][0] < N and valid_col[right_c + DIR[d][1][1]]:
-                    right_r = right_r + DIR[d][1][0]
-
-                if 0 <= right_c + DIR[d][1][1] < N and valid_col[right_c + DIR[d][1][1]]:
-                    right_c = right_c + DIR[d][1][1]
-
-                for c in range(left_c, right_c + 1):
-                    if (left_r, c) in warriors and valid_col[c]:
-                        # warriors[(left_r, c)] = -2
-                        warrior_list.append([left_r, c])
-                        valid_col[c] = False
-                        w += 1
-                    vision[left_r][c] = True
-
-                # 끝점에 전사가 존재
-                if (left_r, left_c) in warriors:
-                    lc = left_c
-                    while lc >= 0:
-                        valid_col[lc] = False
-                        lc -= 1
-                    left_c += 1
-
-                if (right_r, right_c) in warriors:
-                    rc = right_c
-                    while rc < N:
-                        valid_col[rc] = False
-                        rc += 1
-                    right_c -= 1
-
-                if left_r == N - 1 or left_r == 0:
-                    heapq.heappush(potential, (-w, d, warrior_list, vision))
-                    break
-
-        # column-wise  
-        else:
-            while True:
-                if 0 <= top_r + DIR[d][0][0] < N and valid_row[top_r + DIR[d][0][0]]:
-                    top_r = top_r + DIR[d][0][0]
-
-                if 0 <= top_c + DIR[d][0][1] < N and valid_row[top_r + DIR[d][0][1]]:
-                    top_c = top_c + DIR[d][0][1]
-
-                if 0 <= bottom_r + DIR[d][1][0] < N and valid_row[bottom_r + DIR[d][1][0]]:
-                    bottom_r = bottom_r + DIR[d][1][0]
-
-                if 0 <= bottom_c + DIR[d][1][1] < N and valid_row[bottom_r + DIR[d][1][0]]:
-                    bottom_c = bottom_c + DIR[d][1][1]
-
-                for r in range(top_r, bottom_r + 1):
-                    if (r, top_c) in warriors and valid_row[r]:
-                        warrior_list.append([r, top_c])
-                        valid_row[r] = False
-                        w += 1
-                    vision[r][top_c] = True
-
-                # 끝점에 전사가 존재
-                if (top_r, top_c) in warriors:
-                    tr = top_r
-                    while tr >= 0:
-                        valid_row[tr] = False
-                        tr -= 1
-                    top_r += 1
-
-                if (bottom_r, bottom_c) in warriors:
-                    br = bottom_r
-                    while br < N:
-                        valid_row[br] = False
-                        br += 1
-                    bottom_r -= 1
-                 
-                if top_c == 0 or top_c == N - 1:
-                    heapq.heappush(potential, (-w, d, warrior_list, vision))
-                    break
-    
-    # 방향 고르고 전사들 돌로 만들기
-    # -w, d, wlst, vbd = potential[0]
-    neg_w, d, wlst, vbd = potential[0]
-
-    w = neg_w
-
-    for r, c in wlst:
-        warriors[(r, c)] = -1
-
-    return vbd
-
-def calc(mr, mc, N):
-    bd = [[-1] * N for _ in range(N)]
-
-    # q = deque()
-    # q.append([mr, mc, 0])
-    # bd[mr][mc] = 0
-
-    # while q:
-    #     cr, cc, d = q.popleft()
-
-    #     for d in range(4):
-    #         nr = cr + dy[d]
-    #         nc = cc + dx[d]
-
-    #         if nr < 0 or nc < 0 or nr >= N or nc >= N:
-    #             continue
-    #         if bd[nr][nc] != -1:
-    #             continue
-    #         q.append([nr, nc, d + 1])
-    #         bd[nr][nc] = d + 1
-    for i in range(N):
-        for j in range(N):
-            bd[i][j] = abs(i - mr) + abs(j - mc)
-    
-    return bd
-
-
-def hop1(wr, wc, mr, mc, N, vision_bd, dbd):
-    # 상하좌우
-    # 메두사와 거리를 줄일 수 있는 방향으로 
-    q = deque()
-    visited = [[False] * N for _ in range(N)]
-
-    q.append([wr, wc, -1])
-    visited[wr][wc] = True
-
-    while q:
-        cr, cc, dir = q.popleft()
-
-        if cr == mr and cc == mc:
-            return dir
-        
-        for d in range(4):
-            nr = cr + dy[d]
-            nc = cc + dx[d]
-
-            if nr < 0 or nc < 0 or nr >= N or nc >= N:
-                continue
-            if visited[nr][nc]:
-                continue
-            if dbd[nr][nc] != dbd[cr][cc] - 1:
-                continue
-            if vision_bd[nr][nc]:
-                continue
-
-            if dir == -1:
-                dir = d
-            
-            q.append([nr, nc, dir])
-            visited[nr][nc] = True
-
-
-ddy = [0, 0, -1, 1]
-ddx = [-1, 1, 0, 0]
-def hop2(wr, wc, mr, mc, N, vision_bd, dbd):
-    # 좌우상하
-    # 메두사와 거리를 줄일 수 있는 방향으로 
-    q = deque()
-    visited = [[False] * N for _ in range(N)]
-
-    q.append([wr, wc, -1])
-    visited[wr][wc] = True
-
-    while q:
-        cr, cc, dir = q.popleft()
-
-        if cr == mr and cc == mc:
-            return dir
-        
-        for d in range(4):
-            nr = cr + ddy[d]
-            nc = cc + ddx[d]
-
-            if nr < 0 or nc < 0 or nr >= N or nc >= N:
-                continue
-            if visited[nr][nc]:
-                continue
-            if dbd[nr][nc] != dbd[cr][cc] - 1:
-                continue
-            if vision_bd[nr][nc]:
-                continue
-
-            if dir == -1:
-                dir = d
-            
-            q.append([nr, nc, dir])
-            visited[nr][nc] = True
-    
-
-def warrior_move(warriors, mr, mc, N, vision_bd):
-    dist_bd = calc(mr, mc, N)
-
-    to_delete = []
-    to_add = []
-
-    for wr, wc in warriors.keys():
-        if warriors[(wr, wc)] == -1:
-            continue
-
-        dir = hop1(wr, wc, mr, mc, N, vision_bd, dist_bd)
-
-        nr = wr + dy[dir]
-        nc = wc + dx[dir]
-
-        dir = hop2(nr, nc, mr, mc, N, vision_bd, dist_bd)
-
-        nr = nr + ddy[dir]
-        nc = nc + ddx[dir]
-
-        to_delete.append([wr, wc])
-        to_add.append([nr, nc])
-
-    for wr, wc, nr, nc in zip(to_delete, to_add):
-        v = warriors.pop([wr, wc])
-        warriors[(nr, nc)] = v
-
-def warrior_attack(mr, mc, warriors):
-    # 메두사와 같은 칸에 도달한 전사 사라짐
-    to_delete = []
-
-    for r, c in warriors.keys():
-        if r == mr and c == mc:
-            to_delete.append([r, c])
-
-    for r, c in to_delete:
-        del warriors[(r, c)]
-
-def solve():
-    N, M = map(int, input().split())
-
-    mr, mc, pr, pc = map(int, input().split())
-
-    warriors = {}
-    # 사라진 전사는 딕셔너리에서 삭제함
-    # 인덱스가 -1면 임시적으로 돌이 된 전사
-    # for i in range(1, M + 1):
-    #     r, c = map(int, input().split())
-    #     warriors[(r, c)] = i
-    wlst = list(map(int, input().split()))
-
-    for i in range(0, 2 * M, 2):
-        r = wlst[i]
-        c = wlst[i + 1]
-        warriors[(r, c)] = i
-
-    board = []
-    for _ in range(N):
-        board.append(list(map(int, input().split())))
-
-    while warriors:
-        # 1. 메두사 이동
-        mr, mc = medusa_move(board, N, warriors, mr, mc, pr, pc)
-
-        # 메두사의 집에서 공원까지 이어지는 도로 존재하지 않음
-        if mr == -1 and mc == -1:
-            print(-1)
+# 1. 메두사 클래스 생성
+class Medusa:
+    # 1-1.
+    def __init__(self,
+                 Sr:int,
+                 Sc:int,
+                 Er:int,
+                 Ec:int):
+        # 1-1-1. 메두사 위치 선언
+        self.index = (Sr, Sc)
+        # 1-1-2. 공원 위치 선언
+        self.park = (Er, Ec)
+        # 1-1-3. 메두사 이동 경로 생성
+        self.route = self._get_route(Sr, Sc)
+        # 1-1-4. 방향 별 시야 딕셔너리 생성
+        self.dirs = {
+            (-1, 0): [(-1, -1), (-1, 0), (-1, 1)],
+            (1, 0): [(1, -1), (1, 0), (1, 1)],
+            (0, -1): [(-1, -1), (0, -1), (1, -1)],
+            (0, 1): [(-1, 1), (0, 1), (1, 1)]
+        }
+    # 1-2. 최단 경로 선정 함수 생성
+    def _get_route(self,
+                   Sr:int,
+                   Sc:int) -> List[Tuple]:
+        # 1-2-1. 큐 생성 후 메두사 위치 삽입
+        queue = deque([(Sr, Sc)])
+        # 1-2-2. 역추적 그래프 후 현재 위치 방문 처리
+        backtracking_graph = [[False for _ in range(N)] for _ in range(N)]
+        backtracking_graph[Sr][Sc] = True
+        # 1-2-3.
+        while queue:
+            # 위치 인덱스 반환
+            x, y = queue.popleft()
+            for dir_x, dir_y in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                # 다음 위치 설정
+                nx, ny = x+dir_x, y+dir_y
+                # 예외 처리
+                if nx<0 or nx>=N or ny<0 or ny>=N or graph[nx][ny] == 1: continue
+                # 다음 위치에 방문한 적이 없는 경우
+                if not backtracking_graph[nx][ny]:
+                    # 역추적 그래프에 현재 위치 삽입
+                    backtracking_graph[nx][ny] = (x, y)
+                    # 공원에 도달한 경우
+                    if (nx, ny) == self.park:
+                        # 이동경로 리스트 생성 및 반환
+                        route = []
+                        Rx, Ry = nx, ny
+                        while backtracking_graph[Rx][Ry] != True:
+                            route.append((Rx, Ry))
+                            Rx, Ry = backtracking_graph[Rx][Ry]
+                        return route[::-1]
+                    # 큐에 다음 위치 삽입
+                    queue.append((nx, ny))
+        # 1-2-4. 공원에 도달하지 못했으므로 빈 리스트 반환
+        return []
+
+    # 1-3. 이동 함수 생성
+    def move(self, warrior_graph) -> None:
+        self.warrior_graph = warrior_graph
+
+        # 1-3-1. 메두사 위치 업데이트
+        self.index = self.route.pop(0)
+        # 1-3-2. 이동한 곳에 전사가 있는 경우 처리
+        x, y = self.index
+        if self.warrior_graph[x][y]:
+            self.warrior_graph[x][y] = 0
+
+    # 1-4. 메두사 시야 추출 함수 생성
+    def _view_extract(self, dir:Tuple) -> List[List[bool]]:
+        # 1-4-1. 큐 생성 후 메두사 위치 삽입
+        x, y = self.index
+        queue = deque([(x, y)])
+        # 1-4-2. 시야 여부 그래프 생성
+        visible_graph = [[False for _ in range(N)] for _ in range(N)]
+        # 1-4-3. 시야 내 전사 리스트 생성
+        exposed_warriors = []
+        # 1-4-4.
+        while queue:
+            # 위치 인덱스 반환
+            x, y = queue.popleft()
+            for dir_x, dir_y in self.dirs[dir]:
+                # 다음 위치 설정
+                nx, ny = x+dir_x, y+dir_y
+                # 예외 처리
+                if nx<0 or nx>=N or ny<0 or ny>=N: continue
+                # 해당 위치를 본 적이 없는 경우
+                if not visible_graph[nx][ny]:
+                    # 시야 처리
+                    visible_graph[nx][ny] = True
+                    # 해당 위치에 전사가 있는 경우 시야 내 전사 리스트 업데이트
+                    if self.warrior_graph[nx][ny] :
+                        exposed_warriors.append((nx, ny))
+                    # 큐에 다음 위치 삽입
+                    queue.append((nx, ny))
+        # 1-4-5.
+        for x, y in exposed_warriors:
+            # 전사 위치가 메두사 시야에 노출된 경우
+            if visible_graph[x][y]:
+                # 메두사로부터의 방향 선정
+                diff_x = x - self.index[0]
+                diff_y = y - self.index[1]
+                warrior_dirs = [
+                    self.dirs[dir][1],
+                    (
+                        int(diff_x/abs(diff_x)) if diff_x else 0,
+                        int(diff_y/abs(diff_y)) if diff_y else 0
+                    )
+                ]
+                # 큐 생성 후 전사 위치 삽입
+                queue = deque([(x, y)])
+                while queue:
+                    # 위치 인덱스 반환
+                    x, y = queue.popleft()
+                    for dir_x, dir_y in warrior_dirs:
+                        # 다음 위치 설정
+                        nx, ny = x+dir_x, y+dir_y
+                        # 예외 처리
+                        if nx<0 or nx>=N or ny<0 or ny>=N: continue
+                        # 해당 위치가 보이는 경우
+                        if visible_graph[nx][ny]:
+                            # 시야 처리
+                            visible_graph[nx][ny] = False
+                            # 큐에 다음 위치 삽입
+                            queue.append((nx, ny))
+        # 1-4-6. 시야 여부 그래프 반환
+        return visible_graph
+
+    # 1-5. 노출된 전사 수 체크 함수 생성
+    def _check_warriors(self,
+                        visible_graph:List[List[bool]]) -> int:
+        cnt = 0
+        # 1-5-1.
+        for x in range(N):
+            for y in range(N):
+                # 시야가 노출된 경우 전사 수 카운트
+                if visible_graph[x][y]:
+                    cnt += self.warrior_graph[x][y]
+        # 1-5-2. 노출된 전사 수 반환
+        return cnt
+
+    # 1-6. 메두사 시선 함수 생성
+    def gaze(self) -> None:
+        # 1-6-1. 노출된 전사 수 초기화 선언
+        self.warrior_cnt = 0
+        # 1-6-2.
+        for dir in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            # 메두사 시야 추출
+            visible_graph = self._view_extract(dir)
+            # 노출된 전사 수 체크
+            # 노출된 전사 수가 선언된 값보다 많을 경우
+            if self.warrior_cnt < (warrior_cnt:=self._check_warriors(visible_graph)):
+                # 노출된 전사 수 업데이트
+                self.warrior_cnt = warrior_cnt
+                # 시야 그래프 선언
+                self.visible_graph = visible_graph
+
+# 2. 전사 클래스 생성
+class Warrior:
+    # 2-1.
+    def __init__(self,
+                 warriors:List[Tuple]):
+        # 2-1-1. 전사 인덱스 리스트 선언
+        self.warriors = warriors
+        # 2-1-2. 전사 위치 그래프 생성
+        self.warrior_graph = self._create_warrior_graph()
+
+    # 2-2. 전사 위치 그래프 생성 함수 생성
+    def _create_warrior_graph(self) -> List[List[int]]:
+        # 2-2-1. 전사 위치 그래프 초기화
+        warrior_graph = [[0 for _ in range(N)] for _ in range(N)]
+        # 2-2-2.
+        for warrior in self.warriors:
+            # 전사 위치 그래프 업데이트
+            x, y = warrior
+            warrior_graph[x][y] += 1
+        # 2-2-3. 전사 위치 그래프 반환
+        return warrior_graph
+
+    # 2-3. 우선 순위에 따른 이동 함수 생성
+    def _move(self,
+              warrior_x:int,
+              warrior_y:int,
+              priority_dirs:List[Tuple]) -> Tuple[int]:
+        # 2-3-1.
+        for dir_x, dir_y in priority_dirs:
+            # 다음 위치 설정
+            nx, ny = warrior_x+dir_x, warrior_y+dir_y
+            # 예외 처리
+            if nx<0 or nx>=N or ny<0 or ny>=N: continue
+            # 다음 위치가 메두사의 시야 내에서 벗어나면서 메두사와 가까워지는 경우
+            mx, my = self.medusa_index
+            if not self.visible_graph[nx][ny] and abs(mx-warrior_x)+abs(my-warrior_y) > abs(mx-nx)+abs(my-ny):
+                # 다음 위치 반환
+                return (nx, ny)
+        # 2-3-2. 이동이 불가하므로 현재 위치 반환
+        return (warrior_x, warrior_y)
+
+    # 2-4. 이동 함수 생성
+    def move(self, warrior_graph, medusa_index, visible_graph) -> None:
+        self.warrior_graph = warrior_graph
+        self.medusa_index, self.visible_graph = medusa_index, visible_graph
+        self.sub_warrior_graph = [[0 for _ in range(N)] for _ in range(N)]
+
+        # 2-4-1. 이동 거리 및 공격 횟수 선언
+        self.distance, self.attack_cnt = 0, 0
+        # 2-4-2.
+        for x in range(N):
+            for y in range(N):
+                # 현재 위치가 메두사의 시야에서 벗어나면서 기사가 있는 경우
+                if not self.visible_graph[x][y] and self.warrior_graph[x][y]:
+                    px, py = x, y
+                    for priority_dirs in [
+                        [(-1, 0), (1, 0), (0, -1), (0, 1)],
+                        [(0, -1), (0, 1), (-1, 0), (1, 0)]
+                    ]:
+                        # 우선 순위에 따른 이동
+                        nx, ny = self._move(px, py, priority_dirs)
+                        # 이동을 하지 않은 경우 break
+                        if (px, py) == (nx, ny):
+                            break
+                        # 이동 처리
+                        else:
+                            self.distance += self.warrior_graph[x][y]
+                        # 메두사에게 도달한 경우
+                        if (nx, ny) == self.medusa_index:
+                            # 공격 횟수 업데이트
+                            self.attack_cnt += self.warrior_graph[x][y]
+                            break
+                        px, py = nx, ny
+                    # 이동이 마무리되었다면 이동 처리
+                    if (nx, ny) != self.medusa_index:
+                        self.sub_warrior_graph[nx][ny] += self.warrior_graph[x][y]
+                # 기사가 움직일 수 없는 경우 전사 위치 그래프 업데이트
+                elif self.warrior_graph[x][y]:
+                    self.sub_warrior_graph[x][y] += self.warrior_graph[x][y]
+        # 2-4-3. 전사 위치 그래프 업데이트
+        self.warrior_graph = self.sub_warrior_graph[:][:]
+
+N, M = map(int, input().split())
+Sr, Sc, Er, Ec = map(int, input().split())
+length = len(sub_index:=list(map(int, input().split())))
+warriors = [(sub_index[idx], sub_index[idx+1]) for idx in range(0, length, 2)]
+graph = [list(map(int, input().split())) for _ in range(N)]
+
+# 3. 전사 object 생성
+warrior = Warrior(warriors)
+# 4. 메두사 object 생성
+medusa = Medusa(Sr, Sc, Er, Ec)
+# 5. 이동 경로가 존재하지 않는 경우 -1 출력
+if not medusa.route:
+    print(-1)
+else:
+    # 6.
+    while True:
+        # 6-1. 메두사 이동
+        medusa.move(warrior_graph=warrior.warrior_graph)
+        # 6-2. 메두사가 공원에 도착한 경우 0 출력 후 while문 탈출
+        if medusa.index == (Er, Ec):
+            print(0)
             break
-
-        # 2. 메두사의 시선
-        vision_bd = medusa_see(board, N, warriors, mr, mc)
-
-        # 3. 전사들의 이동
-        warrior_move(warriors, mr, mc, N, vision_bd)
-
-        # 4. 전사의 공격
-        warrior_attack(mr, mc, warriors)
-
-        to_modify = []
-        for (r, c), v in warriors.items():
-            if v == -1:
-                to_modify.append([r, c])
-
-        for r, c in to_modify:
-            warriors[(r, c)] = 1
-
-solve()
+        # 6-3. 메두사 시선
+        medusa.gaze()
+        # 6-4. 전사 이동 및 공격
+        warrior.move(warrior_graph=warrior.warrior_graph,
+                     medusa_index=medusa.index,
+                     visible_graph=medusa.visible_graph)
+        # 6-5. 결과 출력
+        print(warrior.distance, medusa.warrior_cnt, warrior.attack_cnt)
