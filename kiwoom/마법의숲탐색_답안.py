@@ -1,3 +1,7 @@
+import sys
+sys.stdin = open('input.txt', 'r')
+input = sys.stdin.readline
+
 R, C, K = map(int, input().split())
 unit = [list(map(int, input().split())) for _ in range(K)]  # si, sj, dr
 arr = [[1]+[0]*C+[1] for _ in range(R+3)]+[[1]*(C+2)]
