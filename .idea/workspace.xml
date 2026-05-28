@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46f4d576-9294-48a4-8227-07320b82aebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kiwoom/민트초코우유2.py" beforeDir="false" afterPath="$PROJECT_DIR$/kiwoom/민트초코우유2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kiwoom/민트초코우유.py" beforeDir="false" afterPath="$PROJECT_DIR$/kiwoom/민트초코우유.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +82,7 @@
       <updated>1779799371853</updated>
       <workItem from="1779799373049" duration="8000" />
       <workItem from="1779799830640" duration="487000" />
-      <workItem from="1779952698721" duration="8110000" />
+      <workItem from="1779952698721" duration="8448000" />
     </task>
     <servers />
   </component>

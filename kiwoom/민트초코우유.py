@@ -393,3 +393,164 @@ def solve():
 
 if __name__ == "__main__":
     solve()
+
+# 남의 코드 2
+from collections import deque
+
+N, T = map(int, input().split())
+
+# 음식 정보
+F = [list(input().strip()) for _ in range(N)]
+
+B = [list(map(int, input().split())) for _ in range(N)]
+
+exp = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+
+def morning():
+    """
+    1. 아침 시간: 모든 학생의 신앙심(B)을 1씩 증가
+    """
+    for r in range(N):
+        for c in range(N):
+            B[r][c] += 1
+
+
+def lunch():
+    """
+    2. 점심 시간:
+    - 인접 & 신봉 음식이 완전히 같은 학생끼리 그룹 형성 (BFS/DFS)
+    - 그룹 내 대표자 선정 (신앙심 최댓값 -> r 최소 -> c 최소)
+    - 신앙심 분배: 그룹원은 대표자에게 1씩 주고, 대표자는 (그룹원 수 - 1)만큼 획득
+    """
+    visited = [[False] * N for _ in range(N)]
+    reps = []  # 대표자 담아
+    # 1. 그룹핑
+    for i in range(N):
+        for j in range(N):
+            if not visited[i][j]:
+                q = deque([(i, j)])
+                visited[i][j] = True
+                group = [(i, j)]  # 이 그룹에 속한 학생의 좌표 모음
+
+                # 2. 대표 선출
+                rep_r, rep_c = i, j  # 대표자 후보 위치 초기화
+                max_b = B[i][j]
+
+                while q:
+                    r, c = q.popleft()
+                    for dr, dc in exp:
+                        nr, nc = r + dr, c + dc
+                        if 0 <= nr < N and 0 <= nc < N and not visited[nr][nc]:
+                            if F[r][c] == F[nr][nc]:
+                                visited[nr][nc] = True
+                                q.append((nr, nc))
+                                group.append((nr, nc))
+
+                                # 대장 조건 갱신 검사
+                                cand_b = B[nr][nc]
+                                if cand_b > max_b:
+                                    max_b = cand_b
+                                    rep_r, rep_c = nr, nc
+                                elif cand_b == max_b:
+                                    if nr < rep_r:
+                                        rep_r, rep_c = nr, nc
+                                    elif nr == rep_r and nc < rep_c:
+                                        rep_r, rep_c = nr, nc
+                # 3. 신앙심 분배
+                group_size = len(group)
+                if group_size > 1:
+                    for gr, gc in group:
+                        if (gr, gc) == (rep_r, rep_c):
+                            B[gr][gc] += (group_size - 1)
+                        else:
+                            B[gr][gc] -= 1
+                reps.append((rep_r, rep_c))
+    return reps
+
+
+def evening(reps):
+    """
+    3. 저녁 시간:
+    - 전파 순서 결정 (단일 -> 이중 -> 삼중 조합 순, 그 안에서는 신앙심 -> r -> c 순)
+    - 전파자들의 전파 시뮬레이션 진행
+      * 방어 상태(당일 전파받은 대표자) 처리 주의
+      * 강한 전파 (x > y) / 약한 전파 (x <= y) 로직 구현
+    """
+    sorted_reps = []
+    for r, c in reps:
+        food_len = len(F[r][c])
+        b_val = B[r][c]
+        sorted_reps.append((food_len, -b_val, r, c))
+    sorted_reps.sort()
+
+    defended = set()
+
+    for food_len, neg_b, r, c in sorted_reps:
+        if (r, c) in defended:
+            continue
+
+        orig_b = B[r][c]
+        if orig_b <= 1:
+            continue
+        x = orig_b - 1
+        B[r][c] = 1
+
+        d = orig_b % 4
+        my_food = F[r][c]
+
+        nr, nc = r, c
+
+        while x > 0:
+            dr, dc = exp[d]
+            nr += dr
+            nc += dc
+
+            if not (0 <= nr < N and 0 <= nc < N):
+                break
+            tg_food = F[nr][nc]
+
+            if my_food == tg_food:
+                continue
+
+            y = B[nr][nc]
+
+            if x > y:
+                F[nr][nc] = my_food
+                B[nr][nc] = y + 1
+                x -= (y + 1)
+                defended.add((nr, nc))
+            else:
+                combined_food = "".join(sorted(set(my_food) | set(tg_food)))
+                F[nr][nc] = combined_food
+
+                B[nr][nc] = y + x
+                x = 0
+                defended.add((nr, nc))
+                break
+
+
+def print_result():
+    """
+    각 날이 끝난 후, 지정된 순서대로 신앙심 총합 출력
+    순서: 민트초코우유(TCM), 민트초코(TC), 민트우유(TM), 초코우유(CM), 우유(M), 초코(C), 민트(T)
+    """
+    targets = ["CMT", "CT", "MT", "CM", "M", "C", "T"]
+
+    score_dict = {food: 0 for food in targets}
+
+    for r in range(N):
+        for c in range(N):
+            food = F[r][c]
+            if food in score_dict:
+                score_dict[food] += B[r][c]
+
+    result_str = " ".join(str(score_dict[food]) for food in targets)
+    print(result_str)
+
+
+for day in range(1, T + 1):
+    morning()
+    reps = lunch()
+    evening(reps)
+    print_result()
