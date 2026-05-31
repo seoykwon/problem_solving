@@ -2,103 +2,66 @@ import sys
 sys.stdin = open('input.txt', 'r')
 input = sys.stdin.readline
 
-# 북 동 남 서
-EXIT = [(-1,0), (0, 1), (1, 0), (0, -1)]
-# 남 서 동
-DIR = [[(2, 0),(1, -1),(1, 1)], [(-1, -1),(0, -2),(1, -1)], [(-1, 1),(0, 2),(1, 1)]]
+R, C, K = map(int, input().split())
+unit = [list(map(int, input().split())) for _ in range(K)]
+arr = [[1]+[0]*C+[1] for _ in range(R+3)] + [[1]*(C+2)]
+exit_set = set()
 
-def mark(board, R, C, golems, id):
-    _, _, r, c = golems[id]
+# 상 우 하 좌 (동쪽: 시계방향)
+di = [-1, 0, 1, 0]
+dj = [0, 1, 0, -1]
 
-    board[r][c] = id
-    for d in range(4):
-        nr, nc = r + EXIT[d][0], c + EXIT[d][1]
+def bfs(si, sj):
+    q = []
+    v = [[0]*(C+2) for _ in range(R+4)]
+    mx_i = 0
 
-        if nr < 0 or nc < 0:
-            break
+    q.append((si, sj))
+    v[si][sj] = 1
 
-        board[nr][nc] = id
+    while q:
+        ci, cj = q.pop(0)
+        mx_i = max(mx_i, ci)
 
-def drop(id, board, R, C, K, golems):
-    _, exit_d, r, c = golems[id]
-    cr, cc = r, c
-    while True:
-        # 남쪽 이동
-        flag = True
-        for chk_r, chk_c in DIR[0]:
-            if board[cr + chk_r][cc + chk_c] != 0:
-                flag = False
-        if flag:
-            cr, cc = cr + EXIT[2][0], cc + EXIT[2][1]
-            golems[id] = [id, exit_d, cr, cc]
-        if not flag:
-            break
+        for di,dj in ((-1,0),(1,0),(0,-1),(0,1)):
+            ni,nj = ci+di, cj+dj
+            if v[ni][nj] == 0 and (arr[ci][cj]==arr[ni][nj] or ((ci,cj) in exit_set and arr[ni][nj]>1)):
+                q.append((ni, nj))
+                v[ni][nj] = 1
 
-    # 서쪽 이동
-    flag = True
-    for chk_r, chk_c in DIR[2]:
-        if board[cr + chk_r][cc + chk_c] != 0:
-            flag = False
-    if flag:
-        cr, cc = cr + EXIT[3][0], cc + EXIT[3][1]
-        exit_d = (exit_d - 1) % 4
-        golems[id] = [id, exit_d, cr, cc]
+    return mx_i-2
+
+ans = 0
+num = 2
+
+for cj, dr in unit:
+    ci=1
 
     while True:
-        # 남쪽 이동
-        flag = True
-        for chk_r, chk_c in DIR[0]:
-            if board[cr + chk_r][cc + chk_c] != 0:
-                flag = False
-        if flag:
-            cr, cc = cr + EXIT[2][0], cc + EXIT[2][1]
-            golems[id] = [id, exit_d, cr, cc]
-        if not flag:
+        if arr[ci+1][cj-1]+arr[ci+2][cj]+arr[ci+1][cj+1]==0:
+            ci += 1
+        elif (arr[ci-1][cj-1]+arr[ci][cj-2]+arr[ci+1][cj-1]+arr[ci+1][cj-2]+arr[ci+2][cj-1])==0:
+            ci+=1
+            cj-=1
+            dr=(dr-1)%4
+        elif (arr[ci-1][cj+1]+arr[ci][cj+2]+arr[ci+1][cj+1]+arr[ci+1][cj+2]+arr[ci+2][cj+1])==0:
+            ci+=1
+            cj+=1
+            dr=(dr+1)%4
+        else:
             break
 
-    # 동쪽 이동
-    flag = True
-    for chk_r, chk_c in DIR[1]:
-        if board[cr + chk_r][cc + chk_c] != 0:
-            flag = False
-    if flag:
-        cr, cc = cr + EXIT[1][0], cc + EXIT[1][1]
-        exit_d = (exit_d + 1) % 4
-        golems[id] = [id, exit_d, cr, cc]
+    if ci < 4:
+        arr = [[1]+[0]*C+[1] for _ in range(R+3)] + [[1]*(C+2)]
+        exit_set = set()
+        num = 2
 
-    while True:
-        # 남쪽 이동
-        flag = True
-        for chk_r, chk_c in DIR[0]:
-            if board[cr + chk_r][cc + chk_c] != 0:
-                flag = False
-        if flag:
-            cr, cc = cr + EXIT[2][0], cc + EXIT[2][1]
-            golems[id] = [id, exit_d, cr, cc]
-        if not flag:
-            break
+    else:
+        arr[ci+1][cj] = arr[ci-1][cj] = num
+        arr[ci][cj-1:cj+2] = [num]*3
+        num +=1
 
-    # 마킹
-    mark(board, R, C, golems, id)
+        exit_set.add((ci+di[dr], cj+dj[dr]))
+        ans += bfs(ci, cj)
 
-    # print(*board)
-
-def solve():
-    R, C, K = map(int, input().split())
-
-    board = [[1]+[0]*C+[1] for _ in range(R + 4)]
-    for c in range(C+2):
-        board[R+3][c] = 1
-
-    golems = {}
-    for i in range(K):
-        c, d = map(int, input().split())
-        golems[i+2] = [i+2, d, 1, c]
-
-    # 2부터 시작하는 골렘 아이디
-    for id in golems.keys():
-        drop(id, board, R, C, K, golems)
-
-    print(*board)
-
-solve()
+print(ans)
