@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46f4d576-9294-48a4-8227-07320b82aebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/kiwoom/민트초코우유.py" beforeDir="false" afterPath="$PROJECT_DIR$/kiwoom/민트초코우유.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kiwoom/마법의숲탐색.py" beforeDir="false" afterPath="$PROJECT_DIR$/kiwoom/마법의숲탐색.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +25,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.마법의숲탐색.executor": "Debug",
     "Python.마법의숲탐색_답안.executor": "Debug",
     "Python.민트초코우유2.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -82,7 +84,8 @@
       <updated>1779799371853</updated>
       <workItem from="1779799373049" duration="8000" />
       <workItem from="1779799830640" duration="487000" />
-      <workItem from="1779952698721" duration="8448000" />
+      <workItem from="1779952698721" duration="8881000" />
+      <workItem from="1780208072186" duration="3747000" />
     </task>
     <servers />
   </component>
@@ -132,6 +135,11 @@
           <line>131</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/kiwoom/마법의숲탐색.py</url>
+          <line>83</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -145,5 +153,6 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/problem_solving$_.coverage" NAME="마법의숲탐색_답안 Coverage Results" MODIFIED="1779963322897" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/kiwoom" />
     <SUITE FILE_PATH="coverage/problem_solving$2.coverage" NAME="민트초코우유2 Coverage Results" MODIFIED="1779976523507" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/kiwoom" />
+    <SUITE FILE_PATH="coverage/problem_solving$.coverage" NAME="마법의숲탐색 Coverage Results" MODIFIED="1780211910777" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/kiwoom" />
   </component>
 </project>
