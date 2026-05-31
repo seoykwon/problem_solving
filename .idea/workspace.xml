@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="46f4d576-9294-48a4-8227-07320b82aebc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/kiwoom/마법의숲탐색.py" beforeDir="false" afterPath="$PROJECT_DIR$/kiwoom/마법의숲탐색.py" afterDir="false" />
-    </list>
+    <list default="true" id="46f4d576-9294-48a4-8227-07320b82aebc" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -84,7 +82,7 @@
       <workItem from="1779799373049" duration="8000" />
       <workItem from="1779799830640" duration="487000" />
       <workItem from="1779952698721" duration="8881000" />
-      <workItem from="1780208072186" duration="4632000" />
+      <workItem from="1780208072186" duration="5165000" />
     </task>
     <servers />
   </component>
